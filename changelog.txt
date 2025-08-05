@@ -1,0 +1,478 @@
+HFSLIP Changelog
+(Editted + reformatted from untouched changelog from evgnb's release.)
+
+<Original HFSLIP changelog by TommyP and Tomcat76>
+* 2005 Jan. 04 - Start.
+* 2005 Jan. 13 - Added MSXML folder copy. Removed CRLUPD.cab from IE6 slipstreaming.
+* 2005 Feb. 19 - Corrected some typos (thanks Bilou Gates). Enter in your own DX9C switch.
+* 2005 Feb. 20 - Corrected some typos (thanks Donjuan). Added support for slipsreaming XP hotfixes. Rerouted program a bit.
+* 2005 Feb. 21 - Cleaned up remnant WORK folders.
+* 2005 Feb. 25 - Added instruction file.
+* 2005 Mar. 03 - Fixed TITLEs.
+* 2005 Mar. 15 - Fixed BANDAID section.
+* 2005 Mar. 27 - Removed need for XP files to slipsteam IE6 into W2K.
+* 2005 Mar. 29 - Added folder initialization.
+* 2005 Apr. 01 - Fixed HF2 switch, added better instructions. Added WINNT.sif fix (thanks Electrician for beta testing).
+* 2005 Apr. 02 - Added SP CAB file stuff.
+* 2005 Apr. 03 - Tweaked XP section and redid front page a bit.
+* 2005 Apr. 04 - Added WINDOWSUPDATE INF file generation.
+* 2005 Apr. 08 - Added automatic registry inputs, eliminated SFC.
+* 2005 Apr. 09 - Added RUNONCEX to integrate IE6 with W2K slipstream.
+* 2005 Apr. 10 - Integrates IE6 faster.
+* 2005 Apr. 11 - Added more INF entries for hotfixes; updated instructions.
+* 2005 Apr. 15 - Look Ma, WINDOWSUPDATE no critical updates.
+* 2005 Apr. 19 - Integrates FDV files to remove IE and slipstream hotfixes.
+* 2005 Apr. 23 - Removed switches; user only needs DirectX9 switch now.
+* 2005 Jul. 01 - Updated for Windows 2000 SP4 update rollup.
+* 2005 Jul. 04 - Corrected for V2 of the installer hotfix, fixed creation of HFRU folder.
+* 2005 Jul. 09 - Redid Hotfix EXE structure, only one HF folder needed now. Incorporated fix to make WU happy for the W2K rollup.
+* 2005 Jul. 12 - Added in some INF information for today's round of hotfixes.
+* 2005 Jul. 13 - Corrected incorporating FDV'S IE removal slipstreaming.
+* 2005 Jul. 14 - Added in languages; added Pene's driver signing fix (nice!). WINNT.SIF no longer needed to run script. Added in initial
+                 run to setup folders and exit automatically.
+* 2005 Jul. 15 - Checks SOURCE root, slipstream process streamlined.
+* 2005 Jul. 16 - Added in W2K ROOTSUPDATE hotfix. Added in new ROOTSUPDATE (Version 7,0,2195,0)... I guess the one changes alot. Started
+                 automating language selection.
+* 2005 Jul. 17 - Added slipstreaming of MSXML3 in case too lazy to add W2K rollup pack to HF folder.
+* 2005 Jul. 19 - Added script for the people who can't read directions.
+* 2005 Jul. 21 - Added in the fix for unicode writing thanks Lupo!
+* 2005 Jul. 22 - Added the TXTSETUP.SIF fix, no need to edit the TXTSETUP.SIF anymore - thanks Lupo! Tweaked IE integration. Updated some of
+                 the integration INFs in the INF folder.
+* 2005 Jul. 23 - Changed the EXE folder to SVPK folder to make it easier to add stuff to SVCPACK.
+* 2005 Jul. 25 - Cleaned up some CATs, updated XP INF files, integrated WINDOWSUPDATE Agent via SVCPACK.
+* 2005 Jul. 30 - Integrated DX9C for W2K, no more bloated DX9!!!! Added some additional WU INF code for other than English updates. Added in
+                 Lupo's localized scripten fix. All languages of IE6SP1 can be slipstreamed now. Added GPL.
+* 2005 Aug. 03 - Added in some more W2K corrections for sloppy M$FT hotfixes.
+* 2005 Aug. 06 - Added REG, CMD, INF import at SVCPACK.inf stage (T-13 minutes).
+* 2005 Aug. 10 - Added W2K3 Server support. Cleaned up various portions of the script. Added headers. Updated INFs.
+* 2005 Aug. 11 - Redid scripting to use MSFT-supplied INF files - no need for INF folder anymore. IESRC folder renamed to HFCABS. All folders
+                 for data are prefixed with HF now. Added in optional OEEXCEP.cab for IE integration incase there are signature issues.
+                 Changed script so that no languages need to be entered, should be fully localized now.
+* 2005 Aug. 13 - Added stuff to IE's help/about/update versions part - this helps WU stay happy. Discovered that WGA cannot be installed
+                 via SVCPACK, so I slipstreamed it instead. Redid installation documentation.
+* 2005 Aug. 18 - Minor tweak for W2K rollup for international users.
+* 2005 Aug. 20 - Added MSOE6 integration stuff. Hopefully this fixes some versions. I hate MSOE. Added a file to keep for the browsing of local
+                 network. Don't complain if there's a missing WINDOWSUPDATE.
+* 2005 Aug. 21 - Added some more MSOE crapola. Added slipstreaming of WINDOWSUPDATEAGENT_20, now slipstreamed, not SVCPACKed.
+* 2005 Aug. 27 - Added WMP10 slipstream (less Windows WDF components).
+* 2005 Sep. 01 - Added some more prompts for people who can't read. Added FDV slim installation.
+* 2005 Sep. 05 - Fixed some Microsoft errors. MSFT is sloppy with their binary revisions and save dates. Added error report form for the people
+                 who refuse to read.
+* 2005 Sep. 06 - Fixed international Microsoft F-up.
+* 2005 Sep. 08 - Redid a ton of code to expand slipstreaming capability.
+* 2005 Sep. 11 - Can slipstream WINDOWSMEDIA codecs, and added more REG stuff for DX9, improved slipstreaming, less files now.
+* 2005 Sep. 17 - Added HFEXPERT integration for power users, PM me for details. Added some nLite integration fixes in case people go overboard
+                 removing components. Improved file detection to slipstream additional files into SOURCESS. Added a step to type something to
+                 run HFSLIP. People who complain about this should thank people who can't read.
+* 2005 Sep. 21 - Tweaked the hell out of the installation process with RUNONCE and RUNONCEEX.
+* 2005 Sep. 25 - Fixed MSHTML in DX issue, fixed double CMD file in SVCPACK.
+* 2005 Sep. 29 - Added a fix for Chinese(Taiwan) localization, and revised WGA for new installer.
+* 2005 Oct. 10 - Some edits nothing crucial, added stuff to the ERROR_REPORT. ERROR_REPORT gets copied to SOURCESS folder too.
+* 2005 Oct. 11 - Added in the DirectX hotfix stuff, fixed some CAT filters.
+* 2005 Oct. 12 - Copies hidden files in the FIX folder.
+* 2005 Oct. 13 - Fixed a few typos for the non-English folks.
+* 2005 Oct. 15 - Added additional HFEXPERT, codec copy errors fixed, imported Yzöwl (thanks!).
+* 2005 Oct. 16 - Added in QFE slipstreaming for the people who like experimental stuff. Added in capability to slipstream files for
+                 the WIN\GRE and WIN\BIN folders. W2K server hotfix fix for a shitty MSFT configuration management.
+* 2005 Oct. 17 - Changed SVCPACK.inf from \I386\SVCPACK to I386\SVCPACK to make it multiboot compatible. Did a SP# and driver merge and
+                 implemented cleanup scripts.
+* 2005 Oct. 30 - Changed the way HFSLIP INFs are processed, improved HFEXPERT.
+* 2005 Nov. 09 - Added in capability for HFCLEANUP. New directions posted on FDV's site.
+* 2005 Nov. 11 - Tweak required for the reduction section.
+* 2005 Nov. 15 - Fixed DX9 HFSLIP INF file, that was a small bug from the big September change.
+* 2005 Nov. 19 - Added in automatic bootsector generation only if WIN CD is present.
+* 2005 Nov. 26 - FDV fileset fix.
+* 2005 Nov. 28 - Hungary fix.
+* 2005 Dec. 10 - Added stuff for slipstreaming whatever SP you have, thanks for the tips Bilou.
+* 2005 Dec. 18 - Added XPSP1 and DX9, may be issues with DirectX9C. Cannot confirm.
+* 2005 Dec. 20 - Fixed smartcard update.
+* 2005 Dec. 22 - I want bloat, I want DirectX9C EXTRA bloat. Well you got it.
+* 2005 Dec. 24 - Added fix for the 2K rollup with the HAL.
+* 2005 Dec. 25 - Added OLEG2'S driver integration. Thanks OLEG2 for all your help.
+* 2006 Jan. 07 - Tweaked the XPSP1 slipstream, issues are IE icon and quicklaunch.
+* 2006 Jan. 13 - Tomcat saves the day. SP1DX9 slipstream fixed. HFCLEANUP cleaned up.
+* 2006 Jan. 15 - XP SP1 and SP2 ironed out. Added optional CAB file instead of monster DRIVERS.cab file.
+* 2006 Jan. 17 - Tested OK. Set for release.
+* 2006 Jan. 19 - Fixed the non-English Network Neighborhood issue for international W2K updates.
+* 2006 Jan. 22 - Service pack slipsteaming... Updated MSXML. Thanks Tomcat76!
+* 2006 Jan. 29 - Updated WGA slipstreaming.
+* 2006 Feb. 08 - Been lacking on this part of the script. DX9 update, WUA20 update, Tomcat76 update. Tomcat rules.
+* 2006 Feb. 20 - Fixed international issue with AU.INF. CABs modded by IEAK6 are accepted now.
+* 2006 Feb. 24 - Enhanced localization section. Initial support for MUWEB and addon packs.
+* 2006 Feb. 25 - Updated support for addon packs.
+* 2006 Feb. 27 - The OPUC3 and IUCTL CABs can now be placed as is in the HFCABS folder.
+* 2006 Feb. 28 - Cleanup. Updated addon packs support.
+* 2006 Feb. 29 - Cleanup. Addon packs made to work with XP/2K3 only are now supported for 2K too.
+* 2006 Mar. 01 - Fixed errors in MSXML and addon packs sections. more cleanup. Separated changelog from script file.
+* 2006 Mar. 02 - Updated localization section (Chinese and Greek).
+* 2006 Mar. 03 - Updated localization section (Chinese).
+* 2006 Mar. 04 - Fixed DX9/codecs collision. Updated localization section.
+* 2006 Mar. 05 - Updated localization section (Norwegian). Added experimental support for [FILEFLAGS]. Cleanup.
+* 2006 Mar. 06 - Fixed errors in HFAAO section. Updated HFDRV section. Added HFAAO to ERROR_REPORT.txt.
+* 2006 Mar. 07 - Updated localization section. Updated handling of KB890046. Added support for KB912945. Cleanup.
+* 2006 Mar. 09 - Updated localization section (FI, FR & TK). Cleaned up output in TXTSETUP.sif and DOSNET.inf.
+                 HFEXPERT\WIN\<SUB>\: leave *.CP* uncompressed and allow hidden files. Compressed MUWEB.DLL. General cleanup.
+* 2006 Mar. 10 - DIAGNOSTIC update.
+* 2006 Mar. 12 - Modified handling of *.CPL AND *.CPI files. Updated output in ERROR_REPORT.txt. DIAGNOSTIC update.
+* 2006 Mar. 13 - Fixed MULTIBOOT path issue. Removed reference to SP CAB from DOSNET.inf when merging with DRIVER.cab.
+* 2006 Mar. 14 - KB912945 FIX. XPSP3RES.dll appears only once in TXTSETUP.sif. Fixed error with some app addons.
+* 2006 Mar. 15 - Fixed problem occuring on Win2K when keepinG IE5 but adding the rollup. Updated output in ERROR_REPORT.txt.
+* 2006 Mar. 16 - LCC fix for XPSP2. CDIMAGEGUI addon workaround. added SP level to ERROR_REPORT.txt. Fixed non-detection of 2K ADV/DCS.
+* 2006 Mar. 18 - Changed things around so HFEXPERT\WIN can add files which are removed by HFCLEANUP.
+* 2006 Mar. 19 - More TITLEs.
+* 2006 Mar. 20 - *.CPI files in HFEXPERT\CODECS are no longer registered.
+* 2006 Mar. 22 - Fixed issue with SPX.cab.
+* 2006 Mar. 24 - Updated SPX.cab handling. Made HFDRV.cab compatible with Windows XP and 2003.
+* 2006 Mar. 25 - Updated handling of MSXML3 for Win2K. Added "CD INSTALL PATH" to ERROR_REPORT.txt. Localization fix for Portuguese.
+* 2006 Mar. 26 - Nothing is added into DOSNET.inf while processing HFCLEANUP and HFEXPERT\WIN if DOSNET.inf doesn't exist.
+* 2006 Mar. 27 - Ignore empty CODECS, APPREPLACEMENT and HIVES folders. Updated handling of ISO creation routine (thanks Kramy).
+                 BOOT.BIN acceptedfor CDIMAGE.
+* 2006 Mar. 28 - Added DRIVERCAB feature. External config file to edit ISO title, name & switches. Updated handling of MSXML3 for Win2K.
+                 Ignore empty HFCLEANUP folder. If both CDIMAGE.exe and MKISOFS.exe exist, only CDIMAGE.exe is ran.
+* 2006 Mar. 30 - Added support for KB901190 (Korean IME) if I386\LANG exists.
+* 2006 Apr. 01 - If both CDIMAGE.exe and MKISOFS.exe exist, MKISOFS.exe is ran. BOOT.img will be renamed to BOOT.bin.
+* 2006 Apr. 21 - MPEG2DATA.ax doesn't exist anymore. Quote destination path of package installer binaries. Full path is used for EXPAND.exe.
+                 If EXPAND.exe exists in HFTOOLS it is used instead. Detect presence of FINDSTR.exe. Renamed ERROR_REPORT.txt to HFSLIP.log.
+                 HFSLIP.Log mentions if SP was slipstreamed. Added copyright notice to HFSLIP.log. Create HFSPACK folder by default.
+                 Compatibility fix for livestate. Workaround for case sensitivity problem with MKISOFS.exe. Added support for XPize.
+                 HFSVPK is now called HFSVCPACK and HFSVPK_SW is now called HFSVCPACK_SW; folders with old names are renamed automatically.
+                 Option to delete CAT files from SVCPACK if custom SFC*.dll detected in FIX or FDVFILES. FIX for non-English KB912812 on Win2K3.
+                 Support for KB908531 (including XPSP1). Copy CLASSIC.wmz. IUCTL.cab fixes. Update to support 2K MDAC hotfix.
+                 Fix for KB912812 when KB912945 is present. Fix for problem with WU catalog site on XP and 2K3. HFSPACK not processed when empty.
+                 CDIMAGE allowed for standalone MAKEISO feature. Updated file and folder format section. Fixed problem with application addons.
+                 Fixed handling of UPHCLEAN for XP/2K3. Support for UPHCLEAN for WIN2K. Support spaces in path to SOURCE when slipstreaming SP.
+* 2006 Apr. 22 - Implemented KB918165 fix. Detect correct SP level when lowercase tag present. Two names added to thanks list.
+* 2006 May  26 - No duplicate type 2 entries in TXTSETUP.sif & DOSNET.inf. Fixed accidental HSCXPSP1.cab removal problem on XPSP1.
+                 EXTRACT.exe is now required for AAO. Backup routine. SVCPACK.inf no longer compressed. Support for RVM update pack.
+                 Dropped support for ISOCONF.txt & XPIZE.txt. HFANSWER.ini replaces ISOCONF.txt & XPIZE.txt. SP moved to HF. Total run time.
+                 Dropped support for EXPAND.exe in alt location. Unneeded driver binaries in I386 can be deleted. Two external plugin files.
+                 WMP Classic handled from 1st EXT plugin file. KB913433 installed from SVCPACK. Slipstream Flash Player from SWFLASH.cab for WinXP.
+                 Q832483 & KB840374 installed via SVCPACK. Removed workaround for CDIMAGEGUI AAO. Improved support for MSXML3.msi.
+                 Improved AAO support. Support for Q832483, Q322011, Q327979, Q810243 & Q814995. Allow type 2 hotfixes without type 1 hotfixes.
+                 Support for KB888111 & KB905474 (genuine ADV notification). Removed REG hack for KB832483 for Win2K. LEGITCHECKCONTROL.dll named
+                 LCC.dll. Dropped support for GWFSPIDGEN.dll & KB918165. QFE files for KB912812 on XPSP1. REG hack for KB833987 & KB914798 on XPSP1.
+                 Post-logon installs (UPHCLEAN.msi for Win2K & MDACTYP.exe). Blocked KB912475. GOTO EOF when %HFSLIP% undefined in GETBOOTBIN.
+                 Differentiate between Pro/Home/SVR/... subversions. AAO CPL & CPI files compressed again. Fixed XPize SVCPACK problem.
+                 Support for KB911565 for WMP8. KB914798 installed at T-13.
+* 2006 Jun. 24 - Fixed DOSNET.inf output error causing failed WU CAT engine install during DOS Install. 2K3SP1 slipstreamed once. USP5 support.
+                 Added REG fix for Q832483 on Win2K. KB911562 for MDAC 2.8 SP1 installed at first logon. KB917344-56, KB911280, aolsupp.exe and
+                 WindowsXP-Windows2000-Script56-KB917344-x86-enu.exe supported. QFE files for KB914389. RTMQFE files for KB916281. Fileflags for
+                 SPX.cab, TSHOOT.dll, BNTS.dll,... Allowed spaces in HFSLIP path when handling HFEXPERT\WIN. Added C to drive check in HFSLIP.cmd.
+                 Exit HFEXPERT when no files are processed. Backup detached from slipstreaming. FOLDERINIT after file check. Intro text update.
+                 HFSLIP.log cleanup. Updated link to HFNETCHK page. Added DELCATS, MAKENOISO, INSTALLRC, SLIPSWFLASH & INCWMPSKIN variables to
+                 HFANSWER.ini. "-no-iso-translate" for MKISOFS. Correct wrong default for BACKUPSOURCE in HFANSWER.ini example file.
+* 2006 Jun. 28 - Fixed bug in handling of CAT files (DELCATS=0 deleted CATS anyway).
+* 2006 Jul. 12 - QFE files used for KB916281 for 2K. Included new product name for XP Flash slipstreaming. W03A2409.dll fix for KB916281 for 2K3.
+                 Generic fix for 2K3SP1 *.HF.* files. Removed fixes for KB912945. CMDOW.exe in HFTOOLS too. CPL/CPI files in CODECS MODIFYPE'D.
+                 Long file names in CODECS truncated to 8.3. Fixed DOSNET.inf problem with some addons. Removed check for modded SFC*.dll for XPize.
+                 Removed FORCEXPIZESVC variable.
+* 2006 Aug. 03 - Get BOOT.bin code fix. Fix detection languages with space. Rewrite of type 1 HFX & slipstreaming sections. Admin warning.
+                 QFE binaries for 2K+IE6/XP/2K3. Flash for 2K and 2K3 moved into main. Fixed KB898461. Fixed double INF entries in HFSLIPWU.inf.
+                 Dropped special treatment of MDAC 2.5 for 2K. UPHCLEAN for Win2K gets correct icon in Add/Remove Programs. REG hack for KB885836.
+                 XPSP2 installer can be named XPSP2.exe.  Return of DX9 for 2K3. HFEXPERT\PROGRAMFILES. Ignore .TXT in HFEXPERT\CODECS.
+* 2006 Aug. 04 - Fix ISO problem.
+* 2006 Aug. 10 - KB917008 for Win2K installed from SVCPACK. ASMS files not compressed. Program Files "root only" fix.
+* 2006 Oct. 21 - Auto binary handling. Delete more unused binaries. Support for XML4&6 from MS06-061. Support for regular MSI files in HFSVCPACK_SW.
+                 Fix for Norwegian lang detection. Sri Lanka time zone REG fix. Support for MSXML2 & KB887606 for MSXML2. Rename EASYCDBLOCK.inf.
+                 Support for *XINPUT* and *XACT*. Improved slipstreaming of KB908981 for 2K3. Added REG entry for W03A2409.dll if OS
+                 is 2K3SP1 ADV/DTC. KB898461 no longer reports 0 files copied. Support for NETW diag tool. Improved slipstreaming of WMFDIST95.exe
+                 and KB887472 for XP. Improved slipstreaming of WMP10 and KB896344 for XPSP2. Introduced slipstreaming of WMP10 for XPSP1 (2nd
+                 install portion pops up). Improved slipstreaming of Q828026, KB817778 AND KB820291 for XPSP1. Registry hack for superseded KB839645.
+                 Support for XPSP1 DOC UPD. Support for MSXML 2.5 hotfix. Improved slipstreaming of UR, KB900725 and WMFDIST.exe for Win2K.
+                 Improved DX9 DOS-based install for 2K. Introduced slipstreaming of WMP6 codecs and WMP9 for Win2K. GDI+ slipstreaming moved to
+                 main script. Fixed prob with roots update. Improved support for IEAK IE6. Workaround for broken INETCOMM.dll from OE5.5 hfx.
+                 Added WMP9 to HFSLIP window title. Updated introduction pages. Code cleanup including suggestions from Yzöwl & THE_GUY.
+                 Removed temp solutions for changes in last months. FORCEDELCATS is phased out. HFDRV no longer used. New storage feature.
+                 Updated dRIVERCAB feature. Improved addon support. DBLBIN*.ext now works with MULTICAB too.
+* 2006 Oct. 22 - %DELCATS% LEQ 1 don't work.
+* 2006 Nov. 11 - ECHO file names when recabbing DRIVER.cab. HFSLIP build number in Add/Remove Programs. Added 3,3 REFS in TXTSETUP.sif for WMP copy.
+                 Support for addons with spaces in INI file. New variable OVERWRITEISO. Use backslash for SOURCEDISKSNAMES folders in HFSLIPWU.inf.
+* 2006 Nov. 12 - Removed double "ECHO>>" in PROGRAMFILES section.
+* 2006 Nov. 18 - IE7 slipstreaming including BRANDING.cab. New FLASH6 update. REGDLL new FLASH9 OCX instead of default REGOCX. MODIFYPE OPUC.dll.
+                 Don't delete 2KIE6 SHLWAPI.dll update. Fileflags update. Storage: no files are added to SCSILOAD if not existent in SCSI.
+* 2006 Dec. 07 - IE7 integrated instead of slipstreamed. KB917008 for 2K is now slipstreamed. Support for TSC 6.0 (shortcut still in COMMUNICATIONS).
+                 Support for WIN RMS Client SP2 (MSI @ T-13). Support for KB928388 timezone update (all OS's). Removed hard Sri Lanka timezone edit.
+                 48-bit LBA support for 2K at beginning of setup. WMP11 slipstreamed for XPSP2 ENU. CD/DVD burning. Support for KB922120 & KB926139.
+                 Delete more type 2 files. Obsolete FORCEDELCATS no longer converted to DELCATS. Arranged WINNTDIRECTORIES section in TXTSETUP.sif.
+* 2006 Dec. 16 - IE7 is installed at GUI logon unless IE7SVCPACK=1 is specified. Fixes for Microsoft update and Office update when integrating IE7.
+                 Timezone changes hard coded into INF hive. Hard coded registry edit for KB926121 for Win2K. Support for Office Genuine Advantage.
+                 Powershell 1.0 installed at first GUI logon (doesn't work from SVCPACK). Support for localized versions of Powershell 1.0.
+                 Support for WMP9/10 update KB923689. Support for D3DX10 CABs. FDVFILES: DELFILES for binaries, TXTSETUP.sif for info files.
+                 Removed workaround for OE 5.5'S INETCOMM.dll as it's fixed in new cumulative.
+* 2007 Jan. 09 - Fixed 2K3SP1 slipstream bug. CAT from XML2 update is included. MCE'05 UR2 is accepted. New DLLs no longer auto-registered.
+                 No multiple references to CUSTSAT.dll. Only check for MODIFYPE if needed. TIMEZONE.inf now called HFSLPHIV.inf. AUTOIT scripts.
+                 Addons entries sections are parsed. SPXCAB with merge options D/E/F. Different numbering for TXTSETUP destination directories.
+* 2007 Feb. 16 - Fixed DRVINDEX.inf corruption. DRIVER.cab not accidentally deleted from SOURCESS. Fix WMP11 taskbar problem. IE7 hotfixes &
+                 BRANDING.cab. Support new TZ update KB931836 (KB929120 blocked). Support WGA notification "STANDALONE" EXE. Support IEAWSDC.CAB.
+                 UPHCLEAN MSI moved. [XP-2K3] Unreferenced files in SOURCE not added to SIF. File names with "MDAC281-KB" blocked. MDAC2.8SP1 UPD
+                 copied as MDAC281U.exe. Improved support USP5. HFSVCPACK EXE installed before HFSVCPACK_SW MSI. ALLUSERS=1 for MSI files.
+                 TZUPDATE var for newer TZ update. "DRIVERCABNAME" line only rewritten if necessary. HFSLIP Add/Remove Programs entry can be removed
+                 via Change/Remove. HFGUIRUNONCE. Some code enhancements. Fixed some error messages. Updated info in intro screens. DBLBIN*.ext
+                 auto-renamed.  Alternate input dirs. Support addons in RAR and ZIP format. Support REG, CMD and INF files with spaces.
+                 *.SYS from STORAGE added under [FLOPPYFILES.2]. NOLOGCOPY to disable copying HFSLIP.log. INCALLSKINS to include abandoned skins.
+* 2007 Feb. 19 - Fixed HFSVCPACK INF problem.
+* 2007 Mar. 05 - MDAC 281 update no longer in Add/Remove Programs for 2K. IE7 slipstreamed. Only PRODUCT.ADD.REG used for XP type 1 hotfixes.
+                 Only PRODUCT.ADD.REG and PRODUCT.ADD.REG.SERVER used for 2K3 type 1 hotfixes. Blocked 2K3SP2 as HFX. Allowed 2K3SP2 slipstreaming.
+                 DOWNLOAD.MICROSOFT.COM & UPDATE.MICROSOFT.COM in 2K3 trusted zones. KB904706 QUARTZ.dll not deleted when slipstreaming DX9 on 2K3SP1.
+                 Show desktop fix taken from NR'S IE7 addon. Blocked DX9 core slipstreaming for XPSP2 and up. All files taken from BRANDING.cab.
+                 LEGITCHECKCONTROL.dll not registered again when KB905474 detected. RMCLIENTBACKCOMPAT.msi installed too. Support for KB928470.
+                 Support for MSI3*.dll binaries. FONTINST.* from type 2 deleted. DIRECTX_* blocked. HFSLPHIV.inf only created when necessary.
+                 AAO binaries can be expanded if HFSLIP folder path contains spaces. Support for HFSLIP_PRE* & HFSLIP_POST*. HFSPLUG2 abandoned.
+* 2007 Mar. 06 - Blocked IE7 integration on XP if MODIFYPE not detected.
+* 2007 Mar. 25 - URL zones not for 2K3SP2. No TXTSETUP.sif edit for 908981 for 2K3SP2. Unlocked XPMCE code. Loosened Q****** filter.
+                 ADDREG.SETUPKEY called for type 2 hotfixes.
+* 2007 Apr. 26 - Fixed "ENFORCED-ONLY" REG bug. DOS support for new D3DX10* & D3DCOMPILER* files. Reuse /ON switch in some cases.
+                 48-bit LBA for 2K with REG.exe if spaces in path. Time script counts correctly until next day at 11:59PM.
+* 2007 May  06 - Support WUA30. WUA20 ignored if both in HF. DEL CREATECAB.CMD for any HFX. INF edited for CREATECAB.cmd for DOS-based installs.
+                 Support IE7 HFX with different naming standard. Support ACADPROC.dll coming from any HFX.
+* 2007 May  12 - IE7 hotfixes with new name can be slipstreamed. ADVPACK.dll from type 2 hotfixes also deleted when slipstreaming IE7.
+                 IE7BACKUP=1 to uninstall IE7 SVCPACK / first GUI.
+* 2007 Jun. 07 - Check host OS. HFSVCPACK_SW becomes SW1 & SW2. UPHCLEAN no longer auto moved. MS update link in Start menu. Support CAPICOM HFX.
+                 Support MUCATALOG*.cab. MRT slipstreamed. Block WMP cumul hotfixes if WMP11 in HF. Allow IE7 REG tweaks thru editing IEUINIT.INF.
+                 Create Show Desktop icon in default user profile with IE7SLIP/IE7SVC. Show Desktop RUNONCE abandoned. MDAC 2.8 Gold/SP1 slipstreamed.
+                 No longer registering deleted WMP9 DLLs. 2KIE6 DANIM.dll SVCPACK rename. Custom 2KIE6 CAB files. 6 EXTRA IE6 files slipstreamed.
+                 Support SCRIPCHS/SCRIPCHT/SCRIPPTB/SCRIPPTG.cab. SCRIP*.cab ignored if newer EXE in HF. WMP11 EXE supported if no HF\WMP11 folder.
+                 Same Flash OCX treatment for XP. Dropped support KB913433. KB923789 not handled if SWFLASH.cab detected. XP/2K3 HFX downleveling.
+                 Updated HFSLIP version representation in HFSLIP.log & Add/Remove.
+* 2007 Jul. 12 - Fix error message slipstreaming both IE6 and 2K3 TZ UPD. Fix error message deleting non-existing QUICKSILVER.wmz in localized WMP9.
+                 Searching for CMPNENTS\NETFX to slipstream NETFX 1.0 UPD. Warning if XP SOURCE lower than SP2.  Fixed XP MSI31 MSI.ADD.REG section.
+                 Proper rename help file 2K3 TSC 6.0. Support for 2K3 KB933854. No extra reference for W03A2409.dll and WS03RES.dll for 2K3SP2.
+                 Fixed IE7 UPDHFSLP.inf handling with non-slipstream. Delayed IE7 slipstream until after HFXS. IE7 slipstream logged in HFSLIP.log.
+                 QMGR.dll copied to BITS folder too. Updates for compressed files in I386 subdirs are compressed; others not. KillBit from KB890046.
+                 dropped support type2 MSOE HFXS. Silent EXEs installed from SVCPACK.inf again (same install order). Roots files copied to SVCPACK.
+                 SOURCE with SVCPACK no longer "unclean". If not USP5, all files except CATs are deleted from SOURCE SVCPACK. HF\BASIC & HF\NOREG.
+                 Moved most [HFSLIPREG] content to HFSLPHIV.inf. AUTOIT scripts copied to SVCPACK. Old DBLBIN*.ext files no longer supported.
+                 When including KB926122, REG entry for "NTDS SDPROP" is not added if OS is Win2K Pro.
+* 2007 Jul. 12 - Fixed new bug slipstreaming XP package installer from HF.
+* 2007 Jul. 30 - Support for MUAUTH.cab. Slipstreaming WMP INF. Optimized DX9 core code. All HFGUIRUNONCE files are quoted in TXTSETUP.sif.
+                 Roots binaries back in I386, to be copied to TEMP folder during TXTMODE copy & executed from there at T-13. Changed JAP to JPN.
+                 Hive INFS in [HIVEINFS.UPGRADE] too. IE6 WU link name changed to "MICROSOFT UPDATE" if MUAUTH.cab is processed. DELCATS_OVERRIDE.
+                 MDAC_TYP BID INF & 2K rollup HFSEC INFs copied to HD and parsed through SECEDIT. Special DX9 treatment for 2K3SP1 now for 2K3SP1+.
+* 2007 Oct. 01 - Fixed HKLM\~\POLICIES permission issue. Support for XPSP3. Blocked 2nd & 3rd cumul TZ update. "W2K_SP5" treated as type 1 HFX.
+                 DEL "56BIT" subfolder. If files in I386 subfolders exist compressed & uncompressed, both are replaced. EASYCDBLOCK.inf in \INF.
+                 Improved KB890046 KillBit detection. Measures against DX9 binary corruption. Support UPDATE.exe in HFTOOLS for SP installers.
+                 Support for CWND.exe. CWND/CMDOW @ command only written if CWND/CMDOW is present. Setup folder HFSLPGUI merged with HFSLIP.
+                 %SYSTEMROOT%\HFSLIP removed at first GUI logon. Support for WSH 5.7. Removed support for WSH 5.6 named as SCRIPTEN.exe.
+                 If both SFCFILES.dl_ & SFCFILES.dll exist, only SFCFILES.dl_ is copied to new SOURCE. Updated intro pages.
+* 2007 Oct. 14 - IEFRAME.DLL.MUI, JSCRIPT.dll & VGX.dll from IE7 HFXs copied by force. IE7 1st GUI logon no longer supported. IE7 SVCPACK default.
+                 IE7 installer extracted with SVCPACK method even if no HFXs present. Show Desktop icon no longer created with SVCPACK method.
+                 IE7SVCPACK variable is ignored. Support for new local 2K3SP2 W03S3*.dll files.
+* 2007 Oct. 25 - Default IE7 handling on XP: IE7SLIPSTREAM > IE7GUILOGON > IE7SVCPACK. Default IE7 handling on 2K3: IE7GUILOGON > IE7SVCPACK.
+                 Support IE7GUILOGON & IE7SVCPACK variables from HFANSWER.ini. IE7 slipstreaming not possible on XP if no CD tag in SOURCE folder.
+* 2007 Nov. 14 - Using FP*0EXT.inf for locale variables. Better detection of Greek SOURCEs. Support for LCIDD variable in HFANSWER.ini.
+                 3076 LCID remapped to Chinese Simplified. Support for DX9 redist in HF. Support for DXDLLREG_X86 & X3DAUDIO CAB packages.
+                 Better support for X3DAUDIO DLLs in XACT CABs. Ignoring D3DX*X64 CABs. Changed XINPUT renames. IE7 PIDCODE is now blank.
+                 PLUGIN.ocx removed during setup if slipstreaming IE7. Separated WMFDIST11.exe code from WMP11 code. Blocked WM9CODECS.exe.
+                 More output when WM packages are processed. Stricter naming rules for WM packages. Ignoring INF from KB832414_MSXML2.5.
+                 Blocked KB918093, KB938977, KB940427 and KB943000 TZ updates. Correctly detecting IE and SP level of GURGLEMEYER USP 5.1.
+                 Blocking IE6 slipstreaming if USP 5.1. 2K-WMP9(C): LAPRXY.dll and LOGAGENT.exe not copied to PF\WMP folder by WIN setup.
+                 Deleting DWINTL.dll from WMP9 if SOURCE is German. 2K with IE6 or WMP9: renaming new DWINTL.dll to DWIL<LCID>.dll.
+                 IE7 HFX without IEFRAME.DLL.MUI: XCOPY files newer than 8-MAR-2007. IE7SLIP: check if exist before deleting DLLCACHE files.
+                 Removed support for IUCTL.cab.
+* 2007 Dec. 12 - REPLACE folder replaces FIX, covering entire SOURCESS folder. Code by Yzöwl to determine host OS.  No admin check if host is Vista.
+                 Checking for FIND.exe too. Increased check for MODIFYPE.exe requirement. HFSLIP aborts if host OS is Vista and MODIFYPE is needed.
+                 Showing names of deleted files from *.EXT file. No auto copy from HFSVCPACK_SW to /SW1 /SW2. Revised HFSLIP.log content.
+                 Code enhancements. Using for file extension too when polling for hotfix. Check if system is still in setup from HFSLPGUI.cmd.
+                 Simplified 890046 KillBit detections. Blocked KB942763. FLASHUTIL*.exe is slipstreamed too (required for registration of Flash).
+                 GDI DET tool registry hack added from HFSLIPWU.inf again. WMS subfolder ignored for 2KPro. WMS/WMS4.cab processed for servers.
+                 RDPWD.sys from rollup removed if KB899591 found in BASIC/NOREG too. MUAUTH.cab copied through HFSLIPWU.inf for 2K too.
+                 Slipstream NETDIAG.exe if SUPPORT.cab doesn't exist. Enhancements for handling of rollup to avoid conflicts with future hotfixes.
+                 Also looking in SUPPORT.cab for REG.exe for 2K. Support regular KB905474 hotfix. More careful handling of KB928470 for XP Home.
+                 Corrected error in RUNONCEEX entry for BITS update for XPSP1. LNG detection required to handle localized 2K3 W03A*409.dll files.
+                 UPDATE.MICROSOFT.COM and DOWNLOAD.MICROSOFT.COM to trusted zones for 2K3SP2.  Hotfixes with DX9 in name slipstreamed after DX9.
+                 Added support for DX9 subfolder from hotfixes. Abandoned DX9 slipstreaming for 2K3SP0. Revised DX9 slipstreaming for 2K3SP1/2.
+                 Custom DX9 CAB created for 2K3SP1/2. IE7 SVCPACK installer new default for 2K3. Show Desktop icon created for 2K3+IE7.
+                 Full SHELL.inf used for several languages to create HFSLIPSD.inf. OFFICE11 AUTH CAB flag added to registry when IE7 is processed.
+                 LNG detection required when slipstreaming IE7. IE7 XMLLITE not processed if SOURCE OS is XPSP3. Delay IEFRAME.dll for IE7 GUI.
+                 Using same HFX detection for IE7 slipstream and integration. IE7 HFX INF files integrated into SVCPACK/GUI installers.
+                 IE7 installer makes backup by default. ForceWMP9Streaming=1 in HFANSWER.ini to force-fix 2K+WMP9 online streaming bug.
+                 LAPRXY.dll and LOGAGENT.exe from WMP9 slipstreamed at T-13 again for several languages. Only existing playlists are slipstreamed.
+                 Tightened rules on which WM10 upgrades work together. Improved support for KB913800 for XPMCE. Support for WM<N> subfolder.
+                 If WM codecs aren't updated, XPMCESP2 and 2K3SP1 get correct files from WM(P)<N>-TYPE HFX. WM(P)<N>-TYPE HFX allowed for WMP11.
+                 Support for KB891122 for WMFDIST9.exe/WMFDIST95.exe. Only WMFDIST95.exe taken from XPMCE rollup update if OS is not XPMCE.
+                 Distinguishing between WMFDIST95.exe from XPMCE rollup and KB891122.
+* 2007 Dec. 21 - HFSLIP.cmd not called twice if not necessary. HUN & ESN Show Desktop icons created normally. Support for WMP10 subfolder in HFX.
+                 Support for possible WMP9 subfolder in future HFX. Avoided 4 errors when not upgrading WMP to EMERALD or WMP11 on XPMCESP2.
+                 Updated credits.
+* 2007 Dec. 26 - Fixed bug: HFSLIP.cmd still called twice when only one section exists. FP_AX_CAB_INSTALLER.exe from SWFLASH.cab installed at T-13.
+* 2008 Feb. 23 - Fixed bug: RIS installing on 2KSVR. Fixed bug: WU asking to install KB926121 on 2KPRO. Detect SFC* in REPLACE\I386 for DELCATS.
+                 Generic support for HFXs containing subfolder named "root". Correctly updating DRIVER.CAB with merge options A/B/C with USP5.
+                 Hardcoded handling of SVCPACK\spsetup.exe from USP5. DELCATS option when USP5 slipstreamed before. USP5 updates in HFSLIP.LOG.
+                 When KB896344-v2 is slipstreamed, migwiz.man, migwiz.htm and migwiz2.htm aren't added to TXTSETUP.SIF and DOSNET.INF again.
+                 KB913800+WMP11 no longer blocked on XPMCE. Allow spaces in HFSLIP folder path when editing ieaccess.inf.
+                 Workaround for problem with WMP11 exe in HF and empty HF\WMP11 subfolder. eula.txt from WMP installers renamed to wmp_eula.txt.
+* 2008 Apr. 09 - Removed ALTSRCDIRS feature. FIX folder content no longer auto-moved to REPLACE\I386. Added auto support for new MFL binaries.
+                 Added support for optional KB943729. Check if SOURCESS exists in MAKEISO mode. Checking for system exes in %PATH% environment.
+                 Windows version determined from PRODSPEC.INI in SOURCE only. Checking for leftover SP folder and UC.DDF when starting HFSLIP.
+                 If custom SFC*.DL_ files exist in FDVFILES, their full name is verified before prompting the user if CAT files can be deleted.
+* 2008 May  22 - Fixed bug preventing AUTOIT scripts from installing. [2K+WMP9] laprxy.dll and logagent.exe are always copied into system32 at T-28.
+                 Allowed slipstreaming of SP3 if the source OS is at SP2.  Workaround for problem with wbemoc.inf in the final version of XP SP3.
+                 Some IE7 binaries from the main IE7 package aren't slipstreamed for XPSP3 because SP3 contains the same or newer versions.
+                 [XPSP3] if IE7 hotfixes don't have SP3 binaries, the SP2 binaries are used. [XPSP3] minor enhancements for WMP11 slipstreaming.
+                 [XP] plugin.ocx is no longer removed when IE7 is slipstreamed. KB925876 is blocked if the source already has TSC 6.0.
+                 [XP/2K3] Start Menu shortcut for Remote Desktop Connection is relocated to Accessories group if KB925876 (TSC 6.0) is slipstreamed.
+                 [2K3] fix for missing shortcuts in Administrative Tools folder when KB925876 is slipstreamed. "Chinese (Hong Kong)" is treated as
+                 Chinese Traditional. [FDVFILES] sped up handling of DELFILES.TXT. [FDVFILES+WMP9] laprxy.dll and logagent.exe are only copied into
+                 system32 if their references aren't commented out in FDVFILES\TXTSETUP.sif. [FDVFILES+WMP9] if logagent.exe is commented out in
+                 FDVFILES\TXTSETUP.sif, the post-install command for logagent.exe is no longer executed.
+* 2008 Jun. 04 - Fixed bug causing mstsc.exe to not be present and RDC shortcut to not be relocated with KB925876. Added support for KB952155.
+                 tscupdatecustom.dll is now renamed to tscupdc.dll.  Old TS clients are now uninstalled via HKLM. Added enforced support for
+                 KB898461 on XPSP3. Workaround for problem slipstreaming SP3 into SP2c source.
+* 2008 Jun. 14 - Added support for KB951376 for WinXP. Allowed slipstreaming of WMP10 onto XPSP3. Current cumulative ActiveX KillBits are
+                 force-added (override with NoKillBits=YES). Blocking Windows Installer 4.5 and Windows Search.
+* 2009 Jan. 07 - Fix for FDVs fileset. KB956391 ActiveX kill bit fix. Added in FDV file detection, now looks for Win2K file. Also looks for WinXP
+                 if FDV develops fileset for XP. Added in fix for Window Media Player hotfixes, added more fixes in for WP hotfixes, added fix for
+                 pesty kill bit.
+* 2009 Mar. 30 - Update to the terms and licensing. Thanks for the words Yzöwl!
+* 2009 Apr. 11 - Rolled in IE8 slipstreaming script generated by rhadamants. Thanks for the creative inputs!
+* 2009 Apr. 17 - Added in a new DX9 hotfix update.
+* 2009 Apr. 18 - Changed software license to Creative Commons license. Personal use means personal use.
+* 2009 Apr. 19 - Tweak to IE8 post-XP section. Thanks for the bug find and bug fix wsmith!
+* 2009 Jun. 03 - Re-do IE8 slipstream (reverted back to rev G and redid changes).
+* 2009 Jun. 06 - Missed a few DX9 corrections that was originally done on April 17th.
+* 2009 Oct. 11 - Added MSI 4.5. It will only work with Windows XP.
+* 2009 Oct. 12 - Slight tweak to MSI 4.5. Added in some DX9 stuff contributed by gluon.
+* 2009 Oct. 15 - Reverted back to rev M and redid changes. Hope this fixes some WMP11 issue.
+* 2009 Oct. 16 - Minor tweak for nonexistant folder and correct the decimal MUI folder.
+* 2009 Oct. 17 - Tweak for W2K codecs and W2K Media Player hotfixes.
+* 2009 Oct. 20 - Added in some more DX9 files, code provided by gluon.
+* 2009 Oct. 31 - Added ActiveX rollup fixes that seem to affect some languages, added in better OS recognition. Redid some code due that arose when
+                 a user reported that a Dell CD gave some copy errors.
+* 2009 Nov. 09 - Upped out of beta and into final. Thanks to all for testing and offering improvements.
+* 2009 Dec. 27 - HFCLEANUP doesn't clean out layout.inf anymore, added in WM11 codec slipstreaming (not the player, just the codecs). Added in some
+                 code for HFCLEANUP parsing; reordered HFCLEANUP and DRIVERCAB merging.
+* 2010 Jan. 16 - Set HFSLIP to ignore KB968930; redid parsing of KB975254 so that the new file is put in the right location. Beta C - redid parsing
+                 of 975254, IIS file is renamed in SOURCESS.
+* 2010 Jan. 17 - Chop my fingers off. Dumb typo in beta C. Beta D.
+* 2010 Jan. 29 - Special FDV request. Beta E.
+* 2010 Feb. 07 - Inki discovered a quirk where TXTSETUP/DOSNET isn't correctly generated. Beta F.
+* 2010 Feb. 10 - Fixed lingering language prob that affected pt-br, zh-tw, zh-cn & zh-hk languages for the MS Installer 4.5. Beta G.
+* 2010 Feb. 27 - IE8 installer was run twice, now it only runs once. Tweaked IE8 install INFs to support IE8 removal for HFCLEANUP. Added ECHOs of
+                 what's happening. Beta H.
+* 2010 Apr. 27 - Various "ECHO" fixes, various HFSLIP.log fixes, XP Home fix issue resolved. Beta I.
+* 2010 Apr. 28 - Fix for the above fix. Beta J.
+
+
+After the release of HFSLIP 1.7.10 Beta J TommyP and Tomcat76 abandoned the project.
+
+Shortly after, Mim0 took effort in recovering the HFSLIP documentation and continued working on the code.
+
+
+<HFSLIP 1.7.10 Beta J vX changelog by Mim0>
+* 2010 Jun. 11 - TITLE-setting corrected, optimized for the current SWFLASH.cab (FlashUt*.dll to Flash-folder instead of System32). Beta J v2.
+* 2010 Sep. 17 - Correct handling of KB975558 (mpg4ds32.ax will updated correctly now). Thx to Acheron. Beta J v3.
+* 2010 Dec. 20 - Fixed output to HHIVADD.txt. Thx to jinjou. Beta J v4.
+* 2011 May  29 - Fixed handling of IE6 CABs when using FDV files. Thx to tomasz86. Beta J v5.
+* 2011 Oct. 06 - Optimized for Flash Player 11 (Control Panel icon for Flash Player settings). Beta J v6.
+* 2011 Nov. 28 - Added slipstreaming MSI 4.5 for Windows 2003 (only if host OS is 2003) and KB979099 (all OS). Thx to Parseus. Beta J v7.
+* 2012 Apr. 05 - Added support for the new files (update service, Control Panel) which comes with Flash Player 11.2. Beta J v8.
+* 2012 Jul. 03 - Fixed handling of newer USP5-versions for Windows 2000. Thx to tomasz86. Beta J v9.
+* 2012 Aug. 26 - Added support for slipstreaming rvkroots.exe. Thx to Explorer09. Beta J v10.
+* 2013 Feb. 07 - Added support for HDD- and network-based installations. Thx to Acheron. Beta J v11.
+
+
+The Beta K series are maintained by Acheron. More work is done on the code to improve integration support of the latest Windows updates.
+
+
+<HFSLIP 1.7.10 Beta K vX changelog by Acheron>
+* 2013 Jun. 11 - Remove redundant START /WAIT commands. Add OnePiece Internet Explorer 8 Addon support. Fix integrating KB942288, KB961118 catalog
+                 files. Support changing temporary SOURCESS folder path through answer file. Miscellanous changes and code fixes. Beta K.
+* 2013 Jun. 17 - Extract Windows Media Player 11 files to TEMP\WMP11 folder. Fix default SOURCESS path. Fix copying all files without exclude.txt.
+                 Beta K v2.
+* 2013 Jun. 27 - Increased Command Prompt screen buffer and window height. Changed project documentation URLs to Mim0's site and updated MSFN forum
+                 links. Prevent deletion of project files when SOURCESS path is set to the HFSLIP directory. Added support for updating uncompressed
+                 sysoc.inf. Removed OS checks when integrating Windows Installer 4.5. Thx to tomasz86. Changed Addon extraction code to fix
+                 short name issues. Also thx to tomasz86 for reporting and fixing this. Beta K v3.
+* 2013 Sep. 01 - Merge a few lines from HFSLIP 2.0 branch. Only delete TEMP folder content, not the folder itself. Beta K v4.
+* 2014 Feb. 23 - Block integration of WUDF 1.7 (WMP11) if found in SOURCE. Add support for integrating KB2878379. Beta K v5.
+* 2014 Feb. 27 - Simplify file registration code and move commands from generated HFSLIP.cmd to HFSLIPWU.inf. Beta K v6.
+* 2015 Jun. 25 - Fix HFSLIPSVC variable is used before declaration issue. Thx to Jakson and tomasz86. Beta K v7.
+* 2015 Aug. 01 - Improve slipstreaming of Internet Explorer 8 files with long names. Beta K v8.
+* 2015 Aug. 15 - Enable redirecting of HFSLIP command output by specifying OUTPUTFILE in answer file. Use PEChecksum instead of modifyPE on Windows
+                 Vista and higher. Fix integrating xpsp4res.dll. Beta K v9.
+* 2015 Aug. 18 - (?) version: 1.7.10K v9 150818
+
+
+A user by the name evgnb then appeared on Acheron's "New HFSLIP 1.7.10 beta K v9 build 20150818" thread on MSFN.org which had for the most part
+died-downed and started posting his continuation of Acheron's code to which he also added code from HFSLIP2000.
+
+
+<HFSLIP 1.7.11 vX changelog by evgnb>
+* 2020 Aug. 09 - Run script on Windows 7 SP1 x86 ~2016:
+                 Version: 1.7.11a-debug, tested with "RUS" Localization.
+                 Fixed bug "advpack.dll dplay.inf GameVoice" (DX9) while installing Windows 2000.
+                 Reset files attributes after extract any update. Some files extracted to TEMP with read-only and/or system attributes and can't
+                 delete by script.
+                 Reset files attributes before clean TEMP, etc.
+                 Improved deletion of registry hive logs (*.LOG1, *.LOG2, *.blf, *.regtrans-ms).
+                 Add: Product ID changed to OEM for Windows 2000 (google "Bypassing the Windows 2000 Serial Check").
+                 Debug release.
+* 2020 Aug. 19 - Version: 1.7.11e-debug
+                 Merged code from branch 1.0.2 of HFSLIP2000 project (dated 2016) to hfslip-1.7.10_beta_K_v9/1.7.11a-debug (dated 2015/2020) and
+                 new version 1.7.11e-debug now integrates XP/2003 updates to Windows 2000 without problem:
+                 + HFSLIP2000 - 2015.08.16 1.0.1 - Rename language specific DLL to xpsp3res.dll when slipstreaming non-English Windows XP
+                                updates into Windows 2000. Slipstream TTC fonts. Fix deleting REG.EXE log files in 2000/XP/2003 when adding
+                                48-bit LBA support. Check for 7ZA.EXE requirements. Cosmetic fixes.
+                 + HFSLIP2000 - 2016.11.19 1.0.2 - Slipstream Type 2 updates silently (changed the /Q switch to /Q:A). Cosmetic fixes (removed
+                                trailing spaces in the script).
+                 Very strange bug fixed - now disable autoconvert long file names to short file names (maybe it's Windows 7 cmd.exe bug).
+                 Merged code from branch 1.0.2 of HFSLIP2000 project - cleanup some *.TMP after Windows install.
+                 Debug release.
+                 
+                 Version: 1.7.11f-debug
+                 Bugfix broken HFSLIPWU.inf DX9C - HFSLIPDY (all OS).
+* 2020 Aug. 22 - Version: 1.7.11n-debug
+                 Downgrade RegisterDlls section and replace it to CMD-file call for Windows 2000 compatibility.
+* 2020 Aug. 27 - Version: 1.7.11q-debug
+                 Replace CMDHIDE.EXE, etc. with simple VBScript code that run batch files with its window hide. No 3rd-party *.exe files needed now.
+                 Less black windows flickers while setup.
+                 [SetupHotfixesToRun] lines in SVCPACK.inf runs from CD [not drive C:], directory is cd_drive:\I386\SVCPACK;
+                 CatalogSubDir="i386\SVCPACK" line from SVCPACK.INF.
+                 CreateProcessW adds to left part every line string "...i386\SVCPACK\" and you may run programs in that directory only.
+                 This is hack for ugly CreateProcessW in svcpack.dll, that run every lines in SVCPACK.inf::SetupHotfixesToRun section.
+                 Solution: you need copy wscript.exe to I386\SVCPACK to use VBScript in SetupHotfixesToRun.
+* 2020 Aug. 28 - Version: 1.7.11s-debug
+                 Refactoring :MAKEISO subroutine.
+                 Version: 1.7.11t-debug
+                 SFC/WFP DRM patch integrated (PatchPAE3 Version: 0.0.0.48 beta-5+ needed).
+* 2020 Sep. 01 - Version: 1.7.11u-debug
+                 Add Driver Signing patch (to delete *.cat files after SFC/WFP DRM patch) - setupapi.dll and PatchPAE3 Version: 0.0.0.48 beta-6+
+                 needed.
+                 Add PAE patch (ntkrnlpa.exe and ntkrpamp.exe).
+
+
+Now I, ultra_code, am throwing my hat into the ring. I have been disappointed by the fact that evgnb's code did not just work out of the box (or
+even at all despite my best efforts) for Windows 2000. I also had issues with Acheron's 1.7.10K v9. I think the issues stemmed from Acheron
+trying to change from HKLM registry entries to simplier entries as noted by his 2014/02/27 changelog update (although I do not have that build
+to test).
+
+So, for HFSLIP v1.8, I made a *lot* of changes to *everything*, including this changelog file. I'm hoping these changes will improve the situation
+a bit and make it easier for newer devs to have a look at the code.
+
+
+<HFSLIP 1.8 changelog by ultra_code>
+* 2024 Aug. 27 - (BETA)
+                 Significantly reformatted, refactored, reorganized, and made the prior code more "strict" in terms of evaluation. Reverted (but
+                 commented-out) a lot of changes/additions made by evgnb in favor of implementations in pre-problematic 1.7.10 (e.g. HFSLIP2000).
+                 "Local" variables are now deleted once used. A lot of GOTO statements (the majority added by evgnb) have been replaced with IF
+                 statements. Some flexibility in the code has been removed (e.g. the script now *requires* 7za.exe to work; 7za.exe has been
+                 included with HFSLIP for a long time). Some bugs I found when looking through the code have been squashed (e.g. WMSLIP addding
+                 configuation information when you weren't slipstreaming WMP into W2K). The patches introduced by evgnb (SFC/WFP, Driver Cert.,
+                 PAE, and Retail-to-OEM) have been made toggleable via HFANSWER.ini. Added a lot of TODO statements to be looked-at by someone
+                 else at a later date. Included in a new DOC directory documentation I manually compiled for HFSLIP v1.8 including the execution
+                 breakdown in main, function breakdowns/layouts, and breakouts of HFSLIP-generated CMD files for easier viewing. Also editted
+                 Defrag.cmd written by Mim0.
+* 2024 Sep. 20 - (BETA)
+                 Corrected variables references made inside of an IF statement whose condition is if that said variable is DEFINED. Variables that
+                 are being checked if they exist will be DelayedExpansion'd in the IF code block in addition to follow-up chained IF conditions.
+                 Also fixed some additional inconsistencies with my formatting I found in the process, as well as a regression I caused where
+                 HFSLIP.log isn't copied to the ISO.
+* 2024 Sep. 23 - (BETA)
+                 Fixed a syntax error with an IF statement that crashed the script in function HF1COMMON_A.
+* 2024 Sep. 25 - (BETA)
+                 Updated some comments in the script. Sharing this with the world proper now.
+* 2025 Aug. 03 - (Release)
+                 Cleaned-up some documentation text inside of the script, changed the searched-for location of HFANSWER.ini to the base directory,
+                 made sure everything in the HFTOOLS directory was up-to-date, and uploaded the main parts of the program and the contents of
+                 HFTOOLS separetely to GitHub.
+
