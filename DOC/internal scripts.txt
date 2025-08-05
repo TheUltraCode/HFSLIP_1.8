@@ -1,0 +1,272 @@
+Internal Scripts
+
+SOURCESS\I386\SVCPACK\HFSLIP.cmd
+> UPDATE_INIT
+TITLE HFSLIP
+FOR %%%%I IN (C D E F G H I J K L M N O P Q R S T U V W X Y Z) DO (
+	IF EXIST %%%%I:\%MBOOTPATH%I386\SVCPACK (
+		SET HFSLIP=%%%%I:\%MBOOTPATH%I386\
+		SET HFSLIPSVC=%%%%I:\%MBOOTPATH%I386\SVCPACK\
+	)
+)
+<
+> CLOSURE
+[WORK\HFSLIPCMDP1.cmd>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd]
+rundll32.exe advpack.dll,LaunchINFSection %%SYSTEMROOT%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Run
+rundll32.exe advpack.dll,LaunchINFSection %%SYSTEMROOT%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Rem
+rundll32.exe iernonce.dll,RunOnceExProcess
+%%HFSLIPSVC%%MP10Setup.exe /C:"setup_wm.exe /Q:A /R:N /DisallowSystemRestore"
+IF EXIST %%SYSTEMROOT%%\*.TMP (
+	ATTRIB -R %%SYSTEMROOT%%\*.TMP
+	DEL /Q/F %%SYSTEMROOT%%\*.TMP
+)
+EXIT /b
+<
+
+
+WORK\HFSLIPCMDP1.cmd
+> SVCPACK_1STLOGON_INST
+MSIEXEC /i %%HFSLIPSVC%%%%I /qn /norestart ALLUSERS=1
+<
+> SVCPACK
+%%SYSTEMROOT%%\regedit.exe /s "%%HFSLIPSVC%%%%I"
+rundll32.exe advpack.dll,LaunchINFSection %%HFSLIPSVC%%%%I,,1
+<
+> WMSLIP
+"%%PROGRAMFILES%%\Windows Media Player\WMPEnc.exe" /RegServer
+"%%PROGRAMFILES%%\Windows Media Player\WMPNetwk.exe" install
+%%SYSTEMROOT%%\inf\unregmp2.exe /Shortcuts /RegExts /ObfuscateSyncPlaylists /MigrateWMC
+<
+> HFEAU
+%%HFSLIPSVC%%%AUTOEXE% %%HFSLIPSVC%%%%I
+<
+> POSTHFX
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\lhmstsc.exe %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\mstsc.exe
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\mstsc.exe
+REN %%SYSTEMROOT%%\SYSTEM32\lhmstsc.exe mstsc.exe
+MSIEXEC /x {376B771D-8C14-4AFF-874B-677C3423F8F8} /quiet
+MSIEXEC /x {5A01A639-CF6C-441D-9EF3-B59C4375FF87} /quiet
+MSIEXEC /x {337240B1-42C2-4384-AAFF-D347A6D2CC5E} /quiet
+MSIEXEC /x {362C838B-54FF-4197-847B-8927FF1742EE} /quiet
+MSIEXEC /x {E606D790-404B-46F7-8DE6-C1FAE06CAC67} /quiet
+MSIEXEC /x {4583EB96-6167-4B87-8F0E-A12A128B3EB0} /quiet
+MSIEXEC /x {200B6216-5FA0-4DAA-BC41-500CE1ADCF97} /quiet
+MSIEXEC /x {B01ED954-EB4F-401F-9CDE-98895FE6F367} /quiet
+MSIEXEC /x {2765750D-7888-4D77-AD27-A71EC00AFF53} /quiet
+MSIEXEC /x {D787C24E-809D-4C48-BF53-EC5C76689A13} /quiet
+%%SYSTEMROOT%%\system32\wbem\mofcomp.exe %%SYSTEMROOT%%\system32\wbem\polprocl.mof
+%%SYSTEMROOT%%\HFSLIP\updroots.exe %%SYSTEMROOT%%\HFSLIP\authroots.sst
+%%SYSTEMROOT%%\HFSLIP\updroots.exe -d %%SYSTEMROOT%%\HFSLIP\delroots.sst
+%%SYSTEMROOT%%\HFSLIP\updroots.exe -l %%SYSTEMROOT%%\HFSLIP\roots.sst
+%%SYSTEMROOT%%\HFSLIP\updroots.exe -l -u %%SYSTEMROOT%%\HFSLIP\rvkcert.sst
+%%SYSTEMROOT%%\HFSLIP\updroots.exe %%SYSTEMROOT%%\HFSLIP\updroots.sst
+<
+> POSTHANDLING_2K
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\danim.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\danim.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\danim2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\danim.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\danim.dll
+REN %%SYSTEMROOT%%\SYSTEM32\danim2.dll danim.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\WEBVW.dll ^(DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\webvw.dll^)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\webvw2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\webvw.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\webvw.dll
+REN %%SYSTEMROOT%%\SYSTEM32\webvw2.dll webvw.dll
+<
+> POSTHANDLING_XP
+IF NOT EXIST %%SYSTEMROOT%%\system32\drivers\bthport.sys IF EXIST "%%HFSLIP%%bthport.sy_" (
+	EXPAND -R "%%HFSLIP%%bthport.sy_" %%SYSTEMROOT%%\system32\drivers
+)
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\iesetup.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\iesetup.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\iesetup2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\iesetup.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\iesetup.dll
+REN %%SYSTEMROOT%%\SYSTEM32\iesetup2.dll iesetup.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\mshtml.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\mshtml.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\mshtml2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\mshtml.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\mshtml.dll
+REN %%SYSTEMROOT%%\SYSTEM32\mshtml2.dll mshtml.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\msrating.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\msrating.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\msratng2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\msrating.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\msrating.dll
+REN %%SYSTEMROOT%%\SYSTEM32\msratng2.dll msrating.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\inseng.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\inseng.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\inseng2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\inseng.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\inseng.dll
+REN %%SYSTEMROOT%%\SYSTEM32\inseng2.dll inseng.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\webcheck.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\webcheck.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\webchck2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\webcheck.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\webcheck.dll
+REN %%SYSTEMROOT%%\SYSTEM32\webchck2.dll webcheck.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\imgutil.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\imgutil.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\imgutil2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\imgutil.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\imgutil.dll
+REN %%SYSTEMROOT%%\SYSTEM32\imgutil2.dll imgutil.dll
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\inetcpl.cpl (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\inetcpl.cpl)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\inetcpl2.cpl %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\inetcpl.cpl
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\inetcpl.cpl
+REN %%SYSTEMROOT%%\SYSTEM32\inetcpl2.cpl inetcpl.cpl
+IF EXIST %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\pngfilt.dll (DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\pngfilt.dll)
+COPY /Y %%SYSTEMROOT%%\SYSTEM32\pngfilt2.dll %%SYSTEMROOT%%\SYSTEM32\DLLCACHE\pngfilt.dll
+DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\pngfilt.dll
+REN %%SYSTEMROOT%%\SYSTEM32\pngfilt2.dll pngfilt.dll
+COPY /Y %%SYSTEMROOT%%\system32\dxtmsft2.dll %%SYSTEMROOT%%\system32\dllcache\dxtmsft.dll
+DEL /Q/F %%SYSTEMROOT%%\system32\dxtmsft.dll
+REN %%SYSTEMROOT%%\system32\dxtmsft2.dll dxtmsft.dll
+COPY /Y %%SYSTEMROOT%%\system32\dxtrans2.dll %%SYSTEMROOT%%\system32\dllcache\dxtrans.dll
+DEL /Q/F %%SYSTEMROOT%%\system32\dxtrans.dll
+REN %%SYSTEMROOT%%\system32\dxtrans2.dll dxtrans.dll
+COPY /Y %%SYSTEMROOT%%\system32\mshtmld2.dll %%SYSTEMROOT%%\system32\dllcache\mshtmled.dll
+DEL /Q/F %%SYSTEMROOT%%\system32\mshtmled.dll
+REN %%SYSTEMROOT%%\system32\mshtmld2.dll mshtmled.dll
+COPY /Y %%SYSTEMROOT%%\system32\mstime2.dll %%SYSTEMROOT%%\system32\dllcache\mstime.dll
+DEL /Q/F %%SYSTEMROOT%%\system32\mstime.dll
+REN %%SYSTEMROOT%%\system32\mstime2.dll mstime.dll
+COPY /Y %%SYSTEMROOT%%\system32\iepeers2.dll %%SYSTEMROOT%%\system32\dllcache\iepeers.dll
+DEL /Q/F %%SYSTEMROOT%%\system32\iepeers.dll
+REN %%SYSTEMROOT%%\system32\iepeers2.dll iepeers.dll
+COPY /Y %%SYSTEMROOT%%\system32\wininet3.dll %%SYSTEMROOT%%\system32\dllcache\wininet.dll
+REN %%SYSTEMROOT%%\system32\wininet.dll wininet.old
+REN %%SYSTEMROOT%%\system32\wininet3.dll wininet.dll
+<
+
+
+SOURCESS\I386\HFSLPGUI.cmd
+> HFSLIPGUI_CMD
+@ECHO OFF
+%CMDHIDE%
+CD %%SYSTEMROOT%%\HFSLIP
+SET SSIP=Y
+%%SYSTEMROOT%%\REGEDIT /S/E SSIP1.txt "HKEY_LOCAL_MACHINE\SYSTEM\Setup"
+TYPE SSIP1.txt>SSIP2.txt
+FOR /F %%%%I IN ('FINDSTR /IR "SystemSetupInProgress.=dword:00000000" SSIP2.txt') DO (SET "SSIP=N")
+IF "%%SSIP%%"=="Y" (
+	rundll32.exe advpack.dll,LaunchINFSection %%SYSTEMROOT%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Run
+	EXIT /b
+)
+TYPE WORK\HFSLPGUI.txt>>%SOURCESS%\I386\HFSLPGUI.cmd
+rundll32.exe advpack.dll,LaunchINFSection %%WINDIR%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Rem
+EXIT /b
+<
+
+
+IEACCESS.cmd
+> IE7SLIP/IE8SLIP
+@ECHO OFF
+SET "IEACCESS="
+FIND /V /I "[Show" WORK\IEACCESS.inf>WORK\IEACCESS1.inf
+FIND /V /I "[Hide" WORK\IEACCESS1.inf>WORK\IEACCESS2.inf
+FIND /V /I "Commandline" WORK\IEACCESS2.inf>WORK\IEACCESS3.inf
+FIND /V /I "TickCount" WORK\IEACCESS3.inf>WORK\IEACCESS4.inf
+FOR /F "delims=" %%%%I IN ('FIND /V /I "----------" WORK\IEACCESS4.inf'^) DO (
+	IF DEFINED IEACCESS (ECHO>>WORK\I386E\ieaccess.inf %%%%I)
+	SET "IEACCESS=1"
+)
+ECHO>>WORK\I386E\ieaccess.inf [ShowIE]
+ECHO>>WORK\I386E\ieaccess.inf Commandline="%%%%11%%%%\ie4uinit.exe -show"
+ECHO>>WORK\I386E\ieaccess.inf TickCount=500
+ECHO>>WORK\I386E\ieaccess.inf [HideIE]
+ECHO>>WORK\I386E\ieaccess.inf Commandline="%%%%11%%%%\ie4uinit.exe -hide"
+ECHO>>WORK\I386E\ieaccess.inf TickCount=500
+EXIT /b
+<
+
+
+WORK\IE7\SETUP.cmd
+> IE7INT
+@ECHO OFF
+%CMDHIDE%
+MD update
+EXPAND UPDATE.cab -F:* update ^>NUL
+update\iesetup.exe%IE7INSTSW% /norestart /update-no%IE7BKPSW%
+[WORK\IE7UPDINF.txt>>WORK\IE7\SETUP.cmd]
+COPY /Y ieframe2.dll %%SYSTEMROOT%%\SYSTEM32
+%%SYSTEMROOT%%\SYSTEM32\REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce" /t REG_EXPAND_SZ /v ZZZieframe1 /d "CMD /C REN %%SYSTEMROOT%%\SYSTEM32\ieframe.dll ieframe.old&REN %%SYSTEMROOT%%\SYSTEM32\ieframe2.dll ieframe.dll" /f
+%%SYSTEMROOT%%\SYSTEM32\REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce" /t REG_EXPAND_SZ /v ZZZieframe2 /d "CMD /C %%SYSTEMROOT%%\SYSTEM32\REG ADD """HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce""" /t REG_EXPAND_SZ /v ieframeold /d """CMD /C DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\ieframe.old""" /f" /f
+EXIT /b
+<
+
+
+WORK\RENAME.cmd
+> IE8SLIP
+"WORK\I386E\ExtExport.exe" extexprt.exe
+REN "WORK\I386E\ie8props.propdesc" ie8props.pro
+REN "WORK\I386E\jsdebuggeride.dll" jsdbgide.dll
+REN "WORK\I386E\jsdebuggeride.dll.mui" jsdbgide.mui
+REN "WORK\I386E\JSProfilerCore.dll" jspfcore.dll
+REN "WORK\I386E\jsprofilerui.dll" jsprflui.dll
+REN "WORK\I386E\JSProfilerCore.dll.mui" jspfcore.mui
+REN "WORK\I386E\jsprofilerui.dll.mui" jsprflui.mui
+<
+> WMSLIP
+REN "WORK\I386E\wmpeffects.dll" wmpeffex.dll
+REN "WORK\I386E\wmdbexport.exe" wmdbxprt.exe
+REN "WORK\I386E\LegitLibM.dll" LegitLbM.dll
+REN "WORK\I386E\connectionmanager.xml" connman.xml
+REN "WORK\I386E\contentdirectory.xml" contdir.xml
+REN "WORK\I386E\mediareceiverregistrar.xml" mrecreg.xml
+REN "WORK\I386E\connectionmanager_stub.xml" connmans.xml
+REN "WORK\I386E\contentdirectory_stub.xml" contdirs.xml
+REN "WORK\I386E\mediareceiverregistrar_stub.xml" mrecregs.xml
+REN "WORK\I386E\WUDFCoinstaller.dll" wudfcoin.dll
+REN "WORK\I386E\WudfPlatform.dll" wudfplat.dll
+REN "WORK\I386E\PortableDeviceApi.dll" PDvApi.dll
+REN "WORK\I386E\PortableDeviceClassExtension.dll" PDvClass.dll
+REN "WORK\I386E\PortableDeviceTypes.dll" PDvTypes.dll
+REN "WORK\I386E\PortableDeviceWiaCompat.dll" PDvWiaCm.dll
+REN "WORK\I386E\PortableDeviceWMDRM.dll" PDvWMDRM.dll
+REN "WORK\I386E\wpdshextautoplay.exe" wpdshext.exe
+REN "WORK\I386E\wpdshextres.dll" wpdshext.res
+REN "WORK\I386E\WPDShServiceObj.dll" wpdshsrv.dll
+<
+> MDAC28
+REN WORK\I386E\mdacreadme.htm mdacrdme.htm
+REN WORK\I386E\mtxoci7x_win2k.reg mtx7x_2k.reg
+REN WORK\I386E\mtxoci7x_winnt.reg mtx7x_nt.reg
+REN WORK\I386E\mtxoci80_win2k.reg mtx80_2k.reg
+REN WORK\I386E\mtxoci80_winnt.reg mtx80_nt.reg
+REN WORK\I386E\mtxoci81_win2k.reg mtx81_2k.reg
+REN WORK\I386E\mtxoci81_winnt.reg mtx81_nt.reg
+<
+> HF1COMMON_A
+REN "WORK\I386E\%%I_%%J" %%I_mmc.mui
+REN "WORK\I386E\%%I_%%J" %%I_mmcm.mui
+<
+> POSTHANDLING_XP
+REN "WORK\I386E\%%I.dll.MUI" %%I.mui
+REN "WORK\I386E\%%I.exe.MUI" %%I.mui
+<
+
+
+MKSDINF.cmd
+> IE7_IE8_FIXES
+@ECHO OFF
+ECHO>%SOURCESS%\I386\HFSLIPSD.inf [Version]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf Signature="$WINDOWS NT$"
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf [Optional Components]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf ShowDesktop
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf [ShowDesktop]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf CopyFiles=Copy.ShowDesktop
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf OptionDesc="%%%%ShowDesktop%%%%"
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf Tip="%%%%ShowDesktop%%%%"
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf Modes=0,1,2,3
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf [SourceDisksNames]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf 1="Windows CD","%CDTAG%",,"\I386"
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf [SourceDisksFiles]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf sdesktop.scf=1
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf [DestinationDirs]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf Copy.ShowDesktop=53,"%%%%ApplicationData%%%%\%%%%QuickLaunchDir%%%%"
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf [Copy.ShowDesktop]
+ECHO>>%SOURCESS%\I386\HFSLIPSD.inf %%%%ShowDesktop%%%%,sdesktop.scf
+TYPE WORK\SHELL.inf>>%SOURCESS%\I386\HFSLIPSD.inf
+ECHO^>^>%SOURCESS%\I386\HFSLIPSD.inf [Strings]
+FOR /F "delims=" %%%%I IN ('FIND /I "ShowDesktop" WORK\SHELL.inf') DO (
+	IF DEFINED SHOWD1 (ECHO>>%SOURCESS%\I386\HFSLIPSD.inf %%%%I)
+	SET /A "SHOWD1=1"
+)
+FOR /F "delims=" %%%%I IN ('FIND /I "QuickLaunch" WORK\SHELL.inf') DO (
+	IF DEFINED SHOWD2 (ECHO>>%SOURCESS%\I386\HFSLIPSD.inf %%%%I)
+	SET /A "SHOWD2=1"
+)
+FOR /F "tokens=2 delims=\" %%%%I IN ('FIND /I "U_SHELL_FOLDERS_APPDATA=" SOURCE\I386\HIVEDEF.inf') DO (
+	IF DEFINED SHOWD3 (ECHO>>%SOURCESS%\I386\HFSLIPSD.inf ApplicationData     = "%%%%I)
+	SET /A "SHOWD3=1"
+)
+<

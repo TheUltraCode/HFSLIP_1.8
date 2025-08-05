@@ -1,0 +1,69 @@
+*Groundwork
+IF %DIAGNOSTIC% (IF EXIST DEL SOURCESS MD SOURCESS\I386\SVCPACK)
+:CHECKWINVER
+:CHECKSOURCE
+Host OS Test
+:GETLANG
+
+*Dependency Tests
+7za test
+modifyPE tests
+:WBEMFIX
+
+*Components
+>"Extract wscript"
+CMDHIDE
+
+*Preparations
+OS-specific preparations
+HFSLIP OS INFORMATION display
+"Native time calculator"
+
+*Start
+:XXX_INIT CALLs
+XPNETFX
+XPMCEROLLUP
+Update Rollup 1 for Windows 2000 SP4.
+Windows Genuine Advantage Notification.
+IE7 stuff
+:IE6SLIP vs :IE7INIT
+:WMSLIP
+MPLEVEL
+Package Installer
+RDP TSC 6.1/6.0
+Hotfixes
+:IE7SLIP vs :IE8SLIP
+WindowsUpdateAgent
+Windows Installer 4.5 (XP & 2003)
+HFCABS
+HF\MSXML
+gdiplus (2000)
+DirectX 9
+HFAAO
+:POSTHFX
+:SVCPACK_1STLOGON_INST
+HFEXPERT
+Copying files from SOURCE into SOURCESS
+HFTOOLS\HFSLIP_PRE*.cmd
+PatchPAE patches
+:INTEGRATE
+:SVCPACK
+:SPXCAB vs :CABEXPAND
+:HFSTOR
+:CLOSURE
+:XPIZE
+IF NOT %MULTICAB% - :HFCLEANUP, :HFEDRVCAB, and/or :CABCOMPACT
+:DELBIN
+:HFEWIN
+:HFEPRG
+:FDVFILESCLEANUP
+REPLACE-ing files
+HFTOOLS\HFSLIP_POST*.cmd
+HFBACKUP replacing SOURCE
+FILESTODEL
+RD WORK
+OEM key patch
+:ERRORREPORT
+:TIMECALC
+Log file copy
+:MAKEISO

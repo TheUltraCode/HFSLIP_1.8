@@ -1,0 +1,287 @@
+Function Breakdown
+
+main
+|--- FILECOMP
+|
+|--- FOLDERINIT (Has parameter)
+| |--- ISNOTEMPTY
+| |--- CLEANTEMP
+|   |--- ISNOTEMPTY (Has parameter)
+|
+|--- AHTESTEXP
+| |--- ADDFFLAGS
+| | |--- CHECKWINVER
+| |
+| |--- HFCLEANUP
+| | |--- HFCLEANUP2 (Subroutine of HFCLEANUP)
+| | |--- DELBIN
+| |
+| |--- CABCOMPACT
+| | |--- UNICAB1
+| |
+| |--- MAKEISO
+|   |--- CHECKWINVER
+|
+|--- START (Subroutine)
+|
+|--- CHECKWINVER
+|
+|--- CHECKSOURCE
+| |--- MAKEBACKUP (Subroutine of CHECKSOURCE)
+| |--- HFSPACK (Subroutine of CHECKSOURCE)
+|
+|--- HOSD (Subroutine)
+|
+|--- GETLANG
+| |--- SETLANGCODES
+|
+|--- WBEMFIX
+|
+|--- SYSOC_INIT
+|
+|--- TXTSETUP_INIT
+|
+|--- DOSNET_INIT
+|
+|--- HFSLIP_INIT
+|
+|--- UPDATE_INIT
+|
+|--- HF1EXTRACT
+| |--- MIDHF1CALLER (Subroutine of HF1EXTRACT)
+|   |--- HF1COMMON_A
+|   | |--- BANDAID2K
+|   | |--- MID_BA_51 (Subroutine of BANDAIDXP2K3)
+|   | |--- SETHEX4ALL
+|   | |--- BANDAIDXP2K3
+|   |   |--- MID_BA_51 (Subroutine of BANDAIDXP2K3)
+|   |
+|   |--- HFINFS
+|   | |--- HFSLIPINFCREATOR1
+|   |
+|   |--- HF1COMMON_B
+|     |--- CLEANTEMP
+|       |>
+|
+|--- IE6SLIP
+| |--- IE6_EXPAND
+| | |--- UNICAB1
+| | |--- UNICAB2
+| |
+| |--- HFSLIPINFCREATOR1
+| |--- IEBRANDING
+|
+|--- IE7INT
+| |--- IEBRANDING
+| |--- IE7INTCOPY
+| | |--- MID_BA_51 (Subroutine of BANDAIDXP2K3)
+| |
+| |--- CLEANTEMP
+| | |>
+| |
+| |--- PARSE_KB
+| |--- IE7_IE8_FIXES
+| |--- UNICAB1
+| |--- UNICAB2
+|
+|--- WMSLIP
+| |--- LEGACYWMP
+| | |--- LEGACYWMP2 (Subroutine of LEGACYWMP)
+| |
+| |--- ISNOTEMPTY
+| |--- WMPINFCREATOR
+| | |--- WMPROROE (Subroutine of WMPINFCREATOR)
+| | |--- WMPTXTDSN (Subroutine of WMPINFCREATOR)
+| |
+| |--- CLEANTEMP
+|   |>
+|
+|--- MIDHF1CALLER (Subroutine of HF1EXTRACT)
+| |>
+|
+|--- HF
+| |--- HF1EXTRACT
+| |--- HF2EXTRACT
+|   |--- MDAC28
+|   | |--- TYPE2ROROE (Subroutine of HFSLIPINFCREATOR2)
+|   | |--- CLEANTEMP
+|   |   |>
+|   |
+|   |--- MIDHF2CALLER (Subroutine of HF2EXTRACT)
+|   |--- HFSLIPINFCREATOR2
+|     |--- TYPE2ROROE (Subroutine of HFSLIPINFCREATOR2)
+|
+|--- HFBASIC
+| |--- PARSE_KB
+| |--- HF1COMMON_A
+| | |>
+| |
+| |--- HF1COMMON_B
+|   |>
+|
+|--- HFNOREG
+| |--- HF1COMMON_A
+| | |>
+| |
+| |--- HF1COMMON_B
+|   |>
+|
+|--- IE7SLIP
+| |--- HFSLIPINFCREATOR1
+| |--- IE7_IE8_FIXES
+| |--- HF1EXTRACT
+| |--- HFBASIC
+| | |>
+| |
+| |--- HFNOREG
+| | |>
+| |
+| |--- IEBRANDING
+| |--- IEACCESS_INF
+| |--- HF1COMMON_A
+| | |>
+| |
+| |--- HF1COMMON_B
+|   |>
+|
+|--- IE8SLIP
+| |--- HFSLIPINFCREATOR1
+| |--- IE7_IE8_FIXES
+| |--- IE8_FIXES
+| | |--- HF1EXTRACT
+| | |--- HFBASIC
+| | | |>
+| | |
+| | |--- HFNOREG
+| |   |>
+| |
+| |--- IEACCESS_INF
+|
+|--- IE8_FIXES
+| |>
+|
+|--- WUA
+| |--- CLEANTEMP
+|   |>
+|
+|--- MSI45 (has parameters)
+| |--- CLEANTEMP
+|   |>
+|
+|--- PROCESSCABS
+| |--- FLASHIT
+|
+|--- MSXML
+|
+|--- DX9C
+| |--- DX9C_PREP
+| | |--- UNICAB1
+| | |--- UNICAB2
+| |
+| |--- DX9C_BASIC
+|   |--- HF1EXTRACT
+|   |--- HFBASIC
+|   | |>
+|   |
+|   |--- HFNOREG
+|     |>
+|
+|--- DX9EXTRA
+|
+|--- HFAAO
+| |--- PROCESS_AAO
+|   |--- AAOCOPY
+|   |--- AAOEDITFILE
+|   | |--- AAOSTRIP
+|   |
+|   |--- CLEANTEMP
+|     |>
+|
+|--- POSTHFX
+| |--- POSTHANDLING_2K
+| | |--- UNICAB1
+| | |--- UNICAB2
+| |
+| |--- POSTHANDLING_XP
+| | |--- UNICAB1
+| | |--- UNICAB2
+| |
+| |--- POSTHANDLING_2K3
+| | |--- UNICAB1
+| | |--- UNICAB2
+| |
+| |--- POSTHANDLING_DEEP
+|
+|--- SVCPACK_1STLOGON_INST
+|
+|--- HFEXPERT
+| |--- HFECODEC
+| | |--- CLEANTEMP
+| |   |>
+| |
+| |--- HFEAPPS
+| |--- HFEHIVE
+| |--- HFEAU
+|
+|--- SFCWFPDRM
+|
+|--- DIGICERTOFF
+|
+|--- PAEPATCH
+|
+|--- INTEGRATE
+| |--- UNICAB1
+| |--- UNICAB2
+|
+|--- SVCPACK
+|
+|--- SPXCAB
+| |--- HFEDRVCAB
+| |--- UNICAB1
+| |--- UNICAB2
+|
+|--- CABEXPAND
+|
+|--- HFSTOR
+|
+|--- CLOSURE
+| |--- HFSLIPGUI_CMD
+| |--- ADDFFLAGS
+|   |--- CHECKWINVER
+|
+|--- XPIZE
+|
+|--- HFCLEANUP
+| |>
+|
+|--- HFEDRVCAB
+|
+|--- CABCOMPACT
+| |>
+|
+|--- DELBIN
+|
+|--- HFEWIN
+| |--- HFESYS32
+| |--- HFEYzowl
+| |--- CLEANTEMP
+|   |>
+|
+|--- HFEPRG
+| |--- CLEANTEMP
+|   |>
+|
+|--- FDVFILESCLEANUP
+|
+|--- ISNOTEMPTY
+|
+|--- OEMKEYEDIT
+|
+|--- ERRORREPORT
+| |--- ISNOTEMPTY
+|
+|--- TIMECALC
+| |--- MIL_CONV
+|
+|--- MAKEISO
+ |>
