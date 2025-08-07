@@ -35,3 +35,11 @@ I would recommend running this script in a VM, disabling UAC, running it from an
 Thanks to TommyP for coming up with this script to begin with. Thanks to all those who contributed to this project prior. And especially thanks to Tomcat76 for both his support with my endeavor and his hosting of new archive HFSLIP websites.
 
 Shout-out to [ss64.com](https://ss64.com/nt/) and [dostips.com](https://www.dostips.com/) for the useful batch scripting documentation and forum posts.
+
+**Older HFSLIP Versions' Download Links**
+
+If you are curious about looking at the older versions of HFSLIP for comparison, here are links to where you can find some of them:
+* [1.7.8](https://ballzofiya.be/-/hfslip/) (last "official" version; Tomcat76's reupload)
+* [1.7.10K v9](https://msfn.org/board/topic/163230-new-hfslip-1710-beta-k-v9-build-20150818/) (Acheron's latest)
+* [HFSLIP2000](https://twilczynski.com/windows/hfslip/) (tomasz86's fork)
+* [1.7.11u-debug](https://msfn.org/board/topic/163230-new-hfslip-1710-beta-k-v9-build-20150818/page/8/#findComment-1187021) (evgnb's latest)
