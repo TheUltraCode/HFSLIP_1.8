@@ -18,9 +18,7 @@ My original work on what I called HFSLIP 1.8 all concluded in late September of 
 
 **Release**
 
-Nearly a year has passed, and now I am deciding to release my code on GitHub instead of keeping it sequestered on MSFN. What gives? It's to advertise my work on a bigger stage with greater visability, for two reasons:
-1. Make finding and contributing easier - keeping this work behind private file shares and forum threads isn't ideal in my opinion, not to mention the purpose of GitHub and other git repositories is to facilitate the use of git for version history and control. GitHub would allow potential new contributors to find it more easily, and make tracking changes and forks easier.
-2. Acknowledgement - I like being able to more conveniently show individuals what I am capable of. It was not the reason I started working on HFSLIP, of course - I was hoping I wouldn't have to do much.
+Nearly a year has passed, and now I am deciding to release my code on GitHub instead of keeping it sequestered on MSFN. What gives? I want to advertise my work on a bigger stage with greater visability to make finding and contributing easier - keeping this work behind private file shares and forum threads isn't ideal in my opinion, not to mention the purpose of GitHub and other git repositories is to facilitate the use of git for version history and control. GitHub would allow potential new contributors to find it more easily, and make tracking changes and forks easier.
 
 If you would like to make changes, I only ask to please try to keep things in the style I have it (there are more specific guidelines laid-out in the script itself).
 
