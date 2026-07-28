@@ -1,5 +1,11 @@
 # HFSLIP 1.8
 
+***Going Forward (2026+)***
+
+*While it has been nice to contribute to the original HFSLIP codebase, its sheer size, complexity, and scope make it hard to properly maintain and iterate on. I am thinking about forking this script into a Windows 2000-only variant that depends on less external programs and is more... cohesive, in addition to solving my gripes with HFSLIP. What's the point of working on something that does not work for you?*
+
+*When that day comes, I'll update this README and point to said work. :)*
+
 **What Is HFSLIP?**
 
 HFSLIP is a Windows batch script meant to slipstream updates into a Windows 2000, XP, or Server 2003 setup ISO (all 32-bit NT5 OSes). It can slipstream normal updates, as well as integrate newer versions of Internet Explorer, Windows Media Player, DirectX, and more.
@@ -12,9 +18,9 @@ When I first encountered evgnb's latest release, I was severely disappointed at 
 
 During my quest to fix the code, I began to normalize and refactor the code: the original script has had so many people make contributions to it that things were done differently depending where in the script you looked. While mostly cosmetic, it did serve as a great excuse to more closely examine the entire codebase, making some things more readable or "cleaner" in terms of layout. Better familiarity with the codebase also helped when it came to debugging issues that arose during testing.
 
-With the script cleaned-up and working, I felt I had to do at least one more thing - write documentation. Function trees, function layouts, noting the sub-scripts that exist inside of HFSLIP, and the overall order-of-execution for the entire script - while this kind of documentation will most likely not help the average user, I hope it does help future developers better understand the layout and execution of the code itself. The text files containing such information can be found in the `DOC` directory.
+With the script cleaned-up and working, I felt I had to do at least one more thing - write documentation. Function trees, function layouts, noting the sub-scripts that exist inside of HFSLIP, and the overall order-of-execution for the entire script - while this kind of documentation will most likely not help the average user, I hope it does help future developers better understand the layout and execution of the code itself. The text files containing such information can be found in the `\DOC` directory.
 
-My original work on what I called HFSLIP 1.8 all concluded in late September of 2024, after a month or two of work. And after all was said and done - I wasn't happy with its capabilities! HFSLIP is just too limited and flawed for my Windows 2000 slipstreaming goals. Not only is the update order for getting Windows 2000 up-to-date manually complex, I'm not happy with how DirectX 9 is handled. Maybe if someone with a more comprehensive understanding of the Windows NT5 setup process could come along and...
+My original work on what I called HFSLIP 1.8 all concluded in late September of 2024, after a month or two of work. And after all was said and done - I wasn't happy with its capabilities! HFSLIP is just too limited and flawed for my Windows 2000 slipstreaming goals. Not only is the update order for getting Windows 2000 up-to-date manually complex, I'm not happy with how DirectX 9 is handled.
 
 **Release**
 
@@ -24,7 +30,7 @@ If you would like to make changes, I only ask to please try to keep things in th
 
 **Setup**
 
-To run HFSLIP, clone this repository and extract it to wherever you like. Then download the necessary "tools" from the sister repository [HFSLIP_TOOLS](https://github.com/TheUltraCode/HFSLIP_TOOLS) and extract those to their respective directories. Run the `hfslip-1.8.cmd` script once to generate all of the missing directories used by HFSLIP. Finally, extract your Windows NT5 setup disc into the "SOURCES" directory. Further how-to-use documentation can be found here ([How-to](https://ballzofiya.be/-/hfslip/howto.html), [Advanced](https://ballzofiya.be/-/hfslip/)).
+To run HFSLIP, clone this repository and extract it to wherever you like. Then download the necessary "tools" from the sister repository [HFSLIP_TOOLS](https://github.com/TheUltraCode/HFSLIP_TOOLS) and extract those to their respective directories. Run the `hfslip-1.8.cmd` script once to generate all of the missing directories used by HFSLIP. Finally, extract your Windows NT5 setup disc into the `\SOURCE` directory. Further how-to-use documentation can be found here ([How-to](https://ballzofiya.be/-/hfslip/howto.html), [Advanced](https://ballzofiya.be/-/hfslip/)).
 
 I would recommend running this script in a VM, disabling UAC, running it from an admin prompt, and piping text output normally sent to the console to an output file defined in HFANSWER.ini (this reduces the run time of the script; I guess outputing text to a terminal has more overhead compared to piping output to a text file).
 
@@ -37,7 +43,8 @@ Shout-out to [ss64.com](https://ss64.com/nt/) and [dostips.com](https://www.dost
 **Older HFSLIP Versions' Download Links**
 
 If you are curious about looking at the older versions of HFSLIP for comparison, here are links to where you can find some of them:
-* [1.7.8](https://ballzofiya.be/-/hfslip/) (last "official" version; Tomcat76's reupload)
+* [1.7.8](https://ballzofiya.be/-/hfslip/) (Tomcat76's reupload)
+* [1.7.10 Beta J](https://msfn.org/board/topic/144214-beta-j-download/#findComment-925249) (final beta released by TommyP; licensing changed from GPL v2 to CC 3.0 BY-NC-SA sometime between 1.7.8 and this beta)
 * [1.7.10K v9](https://msfn.org/board/topic/163230-new-hfslip-1710-beta-k-v9-build-20150818/) (Acheron's latest)
 * [HFSLIP2000](https://twilczynski.com/windows/hfslip/) (tomasz86's fork)
 * [1.7.11u-debug](https://msfn.org/board/topic/163230-new-hfslip-1710-beta-k-v9-build-20150818/page/8/#findComment-1187021) (evgnb's latest)
