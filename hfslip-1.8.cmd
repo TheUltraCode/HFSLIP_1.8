@@ -1,31 +1,26 @@
 @ECHO OFF
-SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
+SETLOCAL ENABLEDELAYEDEXPANSION
 REM HFSLIP by TommyP
 REM Current maintainer - ultra_code (or just ultra :) )
 REM Please let me know of typos, issues, errors, regressions from prior versions, or improvements you want to make to this code. :D
+REM Currently licensed under the CC 4.0 BY-NC-SA (see included LICENSE.txt). Originally licensed under the CC 3.0 BY-NC-SA.
 
 REM This script can be ran on Windows NT OSes from 2000 onwards, ALTHOUGH if you do run this on 2000, you will require REG.exe from XP to be
 REM placed inside of HFTOOLS at the very least. Frankly, though, I would recommend just running this script under Vista or later (NT6+).
 
 REM A couple of formatting standards I've used:
-REM   * All white-space code indentation is done with TABs, not 4 SPACEs, because I believe it's more compatbile with CMD.
-REM   * All SETs are surrounded by appropriate double-quotation marks.
-REM   * All variables meant to be integer-only use the /A switch prior to the setting of the variable.
-REM   * All "local" variables are "deleted" when done with (some other variable types are deleted as well).
+REM   * All white-space code indentation is done with TABs, not 4 SPACEs, because it is more compatbile with CMD.
+REM   * All SETs are surrounded by appropriate double-quotation marks when possible.
+REM   * All variables meant to be integer-only use the /A switch prior to the setting of the variable, excpet "external" integers read from HFANSWER.ini.
+REM   * All variables are ideally "deleted" when done with.
 REM   * All file extensions are in lower case.
-REM   * All commands with switches after them have their switches separated from them by a space (e.g. DIR /B vs DIR/B). Switches themselves can
-REM     be joined together however (e.g. DIR /B/A-D).
-REM   * CMD commands, batch statements, etc., are for the most part capitalized.
-REM   * Parentheses are used when possible with all code blocks, from IFs to FORs; NOTHING is to be left to the programmer to interpret.
-REM   * Escapes like "&" that allow for multiple commands on one line are used sparingly.
+REM   * All commands with switches after them have their switches separated from them by a space (e.g. DIR /B vs DIR/B). Switches themselves can be joined together however (e.g. DIR /B/A-D).
+REM   * CMD commands, variables, etc., are capitalized.
+REM   * Parentheses are used when possible with all code blocks; *nothing* is to be left to the programmer to interpret.
+REM   * Escapes like "&&" that allow for multiple commands on one line are ideally avoided.
 REM   * Newlines created by ECHOs are done by "ECHO/" (supposedly this causes the least amount of potential issues).
-REM   * Variables read from HFANSWER.ini that are supposed to be integers are compared with "==" because I cannot assume 100% of the time they
-REM     will be integers. However, integer variables inside of HFSLIP will always be compared with integer-only comparators.
-REM   * Comments are ideally supposed to follow normal English grammatical structure (i.e. capitalize letters that should be, periods at the end
-REM     of sentences, etc.). Key word is ideally. Some comments I cannot help but feel like I want to leave them the way they are. :P
-REM   * Functions are roughly ordered in the order they are called from in "main" (i.e. the *main* part of this script that isn't a function - it
-REM     has two subroutine labels in it though for skipping code) or from other functions, and are grouped mostly by category (this is a
-REM     subjective matter).
+REM   * Comments are ideally supposed to follow normal English grammatical structure. Some comments, though, I leave the way they are. :P
+REM   * Functions are roughly ordered in the order they are called from in "main", grouped by category.
 
 REM Please look for "TODO"s (in caps) throughout this script for things I have questions on, worry about, etc.
 
@@ -40,11 +35,6 @@ REM with 2000 + I trust the older implementation better. Sometimes follows @;.
 REM todo - any TODO's written by evgnb, distinct from those I have written in capital.
 
 REM Any Russian comments left by evgnb I Google-translated from Russian into English for a rough-idea of what they were trying to convey.
-
-REM Nested IF structures might be necessary because if you chain multiple IF statements together, only the *last* IF statement in a chain evokes
-REM the accompanying ELSE statement if false. All prior chained IF statements skip the whole code block.
-REM TODO Check to see if there are any other situations like this in this code... nearly 1800 IF statements to check. If you want to suffer, this
-REM is the way to help yourself. Only IF code blocks where we *need* an ELSE statement must be corrected.
 
 REM HFSLIP2000 should be (?) some version of 1.7.10 *before* 1.7.10's maintainer(s) decided to make the changes to "HKLM" registry entries.
 
@@ -66,7 +56,7 @@ IF NOT "%1"=="outputset" (
 	)
 	IF DEFINED OUTPUTFILE (
 		START "" CMD /C %~n0 outputset ^> !OUTPUTFILE! ^2^>^&^1
-		EXIT
+		EXIT /B
 	)
 )
 
@@ -80,7 +70,7 @@ SET "T1=TommyP's NT5.X Slipstreamer - HFSLIP"
 TITLE %T1%
 
 REM HFSBUILD = YYMMDD
-SET /A "HFSBUILD=250803"
+SET /A "HFSBUILD=260726"
 SET "HFSVER=1.8"
 REM PREP is the directory HFSLIP is running is, the base directory.
 SET "PREP=%~dps0"
@@ -91,9 +81,10 @@ SET "MCEMP10CUM=KB913800"
 SET "SW1=/q /n /z"
 SET "SW2=/Q:A /R:N"
 IF NOT DEFINED SOURCESS (SET "SOURCESS=%PREP%\SOURCESS")
-IF %SOURCESS:~-1%==\ (SET "SOURCESS=%SOURCESS:~0,-1%")
+IF "%SOURCESS:~-1%"=="\" (SET "SOURCESS=%SOURCESS:~0,-1%")
 REM Check if SOURCESS is a full path, not just a drive letter.
 SET "SOURCESSPATH=!%SOURCESS%"
+REM Removes the "C:" from the path. *Only* works with DelayedExpansion. Seems like a hack to me, but it works.
 IF NOT DEFINED SOURCESSPATH (SET "SOURCESS=%PREP%\SOURCESS")
 SET "SOURCESSPATH="
 
@@ -374,37 +365,22 @@ CALL :CHECKSOURCE
 
 REM Find host OS - based on code posted by Yzöwl on MSFN.org.
 SET "HostOS=Unknown"
-FOR /F "delims=" %%I IN ('NET CONFIG WORK^|FIND /I " Windows "') DO (
-	ECHO %%I|FIND "2000" >NUL 2>&1 && (
+FOR /F "delims=" %%I IN ('NET CONFIG WORKSTATION ^| FIND /I " Windows "') DO (
+	REM TODO: I hate conditional execution statements... Replace with FOR loops.
+	ECHO %%I | FIND "2000" >NUL 2>&1 && (
 		SET "HostOS=2000"
-		GOTO :HOSD
 	)
-	ECHO %%I|FIND "2002" >NUL 2>&1 && (
+	ECHO %%I | FIND "2002" >NUL 2>&1 && (
 		SET "HostOS=XP"
-		GOTO :HOSD
 	)
-	ECHO %%I|FIND "XP" >NUL 2>&1 && (
+	ECHO %%I | FIND "XP" >NUL 2>&1 && (
 		SET "HostOS=XP"
-		GOTO :HOSD
 	)
-	ECHO %%I|FIND "2003" >NUL 2>&1 && (
+	ECHO %%I | FIND "2003" >NUL 2>&1 && (
 		SET "HostOS=2003"
-		GOTO :HOSD
 	)
-	ECHO %%I|FINDSTR /I "Vista 7 8 8.1 10 11" >NUL 2>&1 && (
+	ECHO %%I | FINDSTR /I "Vista 7 8 8.1 10 11" >NUL 2>&1 && (
 		SET "HostOS=Vista"
-		GOTO :HOSD
-	)
-)
-
-REM TODO This bit doesn't quite make sense. If you are on a pre-Vista OS, you *are* usually *the* admin. And on Vista+ OSes, it makes sense *to* run
-REM this script without UAC and with admin privileges. Further testing required?
-:HOSD
-IF NOT "%HostOS%"=="Vista" (
-	REGEDIT/S/E ADMIN1.txt "HKEY_USERS\.DEFAULT\Software\Microsoft\NetDDE"
-	IF EXIST ADMIN1.txt (
-		DEL /Q/F ADMIN1.txt
-	) ELSE (
 		ECHO/>CON
 		ECHO You are advised to run HFSLIP with administrative privileges.>CON
 		PAUSE>CON
@@ -426,7 +402,7 @@ IF NOT EXIST HFTOOLS\7za.exe (
 	ECHO/>CON
 	ECHO Press any key to quit.>CON
 	PAUSE >NUL
-	EXIT
+	EXIT /B
 )
 
 REM Check for modifyPE.exe requirement.
@@ -457,7 +433,7 @@ IF DEFINED MPEREQ (
 			ECHO/>CON
 			ECHO Press any key to quit.>CON
 			PAUSE>NUL
-			EXIT
+			EXIT /B
 		) ELSE (
 			IF EXIST HFTOOLS\MODIFYPE.exe (
 				SET "MODIFYPE=HFTOOLS\MODIFYPE.exe"
@@ -468,7 +444,7 @@ IF DEFINED MPEREQ (
 				ECHO/>CON
 				ECHO Press any key to quit.>CON
 				PAUSE>NUL
-				EXIT
+				EXIT /B
 			)
 		)
 	)
@@ -486,7 +462,7 @@ IF "%VERSION%"=="XP" IF %SP% EQU 3 (
 		ECHO Please get wbemoc.cab and put it in HFCABS.>CON
 		ECHO/>CON
 		PAUSE>CON
-		EXIT
+		EXIT /B
 	)
 )
 
@@ -557,6 +533,7 @@ IF "%VERSION%"=="2000" (
 		!REGEXE! add HKLM\HFSLIP\ControlSet001\Services\atapi\Parameters /v EnableBigLba /t reg_dword /d 00000001 /f >NUL
 		!REGEXE! unload HKLM\HFSLIP >NUL
 		
+		REM TODO: Research this more.
 		REM 2024/8/1
 		REM I guess XP's REG.exe does not create SETUPREG.HIV*.blf and SETUPREG.HIV*.regtrans-ms files as compared to 7's.
 		REM Thus, any errors piped to NUL.
@@ -684,8 +661,12 @@ ECHO     Service Pack:       %SP% >CON
 ECHO     Localization:       %Localization% >CON
 ECHO     LCIDD:              %LCIDD% >CON
 ECHO/>CON
-IF "%VERSION%"=="2000" IF DEFINED LBASUPPORT (
-	ECHO     48-bit LBA Support: Added>CON
+IF "%VERSION%"=="2000" (
+	IF DEFINED LBASUPPORT (
+		ECHO     48-bit LBA Support: Added>CON
+	) ELSE (
+		ECHO/>CON
+	)
 ) ELSE (
 	ECHO/>CON
 )
@@ -768,7 +749,7 @@ IF "%VERSION%"=="2000" IF EXIST HF\*891861*.exe (
 		SET "HF=%%I"
 		CALL :HF1EXTRACT
 		IF DEFINED SERVER (
-			FOR /F %%I IN ('DIR /B/A-D/S HF\*899591*.exe') DO (SET /A "DELRDPWD=1")
+			FOR /F %%I IN ('DIR /B/A:-D/S HF\*899591*.exe') DO (SET /A "DELRDPWD=1")
 			IF DEFINED DELRDPWD (
 				DEL /Q/F WORK\I386E\rdpwd.sys
 				SET "DELRDPWD="
@@ -879,7 +860,7 @@ SET /A "HFSLP=199"
 REM Installs a "a permanent copy of Package Installer for Windows to enable software updates to have a significantly smaller download size."
 REM XP SP3 does not have this stock even though SP3 was released after this update was released.
 IF EXIST HF\*898461*.exe (
-	FOR /F %%I IN ('DIR /B/OD HF\*898461*.exe') DO (SET "PKGINST=%%I")
+	FOR /F %%I IN ('DIR /B/O:D HF\*898461*.exe') DO (SET "PKGINST=%%I")
 	ECHO !PKGINST!
 	HF\!PKGINST! /Q /X:TEMP
 	SET "PKGINST="
@@ -898,9 +879,9 @@ IF EXIST HF\*898461*.exe (
 REM Remote Desktop Connection (Terminal Services Clients 6.1/6.0) for XP SP2.
 REM AFAI can tell, XP SP3 does include this or a newer version stock.
 IF EXIST HF\*952155*.exe (
-	FOR /F %%I IN ('DIR /B/OD HF\*952155*.exe') DO (SET "TSCINST=%%I")
+	FOR /F %%I IN ('DIR /B/O:D HF\*952155*.exe') DO (SET "TSCINST=%%I")
 ) ELSE IF EXIST HF\*925876*.exe IF NOT %OSLEVEL% EQU 23 (
-	FOR /F %%I IN ('DIR /B/OD HF\*925876*.exe') DO (SET "TSCINST=%%I")
+	FOR /F %%I IN ('DIR /B/O:D HF\*925876*.exe') DO (SET "TSCINST=%%I")
 )
 IF DEFINED TSCINST (
 	ECHO !TSCINST!
@@ -987,7 +968,7 @@ IF "%VERSION%"=="2000" IF EXIST HF\gdiplus*.exe (
 
 REM DirectX 9
 IF EXIST HF\directx*redist.exe (
-	FOR /F %%I IN ('DIR /B/ON HF\directx*redist.exe') DO (SET "DX9REDIST=%%I")
+	FOR /F %%I IN ('DIR /B HF\directx*redist.exe') DO (SET "DX9REDIST=%%I")
 )
 IF DEFINED DX9REDIST IF "!DX9REDIST!"=="directx_9c_redist.exe" IF EXIST HFCABS\_DX9core_%VERSION%SP%SP%_HFSLIP.cab (SET "DX9REDIST=")
 IF DEFINED DX9REDIST (
@@ -1019,7 +1000,7 @@ IF DEFINED DX9REDIST (
 		ECHO Checking if extra DX9 packages need to be copied into HFCABS...
 		DEL /Q/F WORK\DXREDIST\*MDX*
 		IF NOT DEFINED BDACAB (DEL /Q/F WORK\DXREDIST\dxdllreg*)
-		FOR /F %%I IN ('DIR /B/ON WORK\DXREDIST\*x86.cab') DO (
+		FOR /F %%I IN ('DIR /B WORK\DXREDIST\*x86.cab') DO (
 			IF NOT EXIST HFCABS\%%I (
 				COPY WORK\DXREDIST\%%I HFCABS >NUL
 				ECHO %%I
@@ -1064,7 +1045,7 @@ TITLE %T1%
 
 REM Running specific HFTOOLS.
 IF EXIST HFTOOLS\HFSLIP_PRE*.cmd (
-	FOR /F %%I IN ('DIR /B/ON HFTOOLS\HFSLIP_PRE*.cmd') DO (CALL HFTOOLS\%%I)
+	FOR /F %%I IN ('DIR /B HFTOOLS\HFSLIP_PRE*.cmd') DO (CALL HFTOOLS\%%I)
 )
 
 REM evgnb:
@@ -1081,7 +1062,7 @@ IF "%CERTPATCH%"=="1" (CALL :DIGICERTOFF)
 
 REM PAE patch
 REM Using PatchPAE3 v0.0.0.48 beta-6 included with 1.7.11debug, it does not work with either the SP4.cab or the DRIVER.cab kernel files, thus I wouldn't bother to try enabling this patch.
-REM Used Windows 7 SP1 with VC++ 10 redists installed - coult not get it or the earlier beta-3 on evgnb's Github page (evgen_b) to work with the files.
+REM Used Windows 7 SP1 with VC++ 10 redists installed - could not get it or the earlier beta-3 on evgnb's Github page (evgen_b) to work with the files.
 REM Perhaps the Russian kernel files have a slightly different binary?
 IF "%PHADEXPATCH%"=="1" (CALL :PAEPATCH)
 TITLE %T1%
@@ -1139,7 +1120,7 @@ REM REPLACE-ing files.
 CALL :ISNOTEMPTY REPLACE
 IF DEFINED NOTEMPTY (
 	REM NT 5.X OSes do not allow files to have a "." at the beginning of a file/folder name. Vista and newer does.
-	FOR /F "delims=" %%I IN ('DIR /B/A-D-H-S/S REPLACE ^| FINDSTR /C:"\\\." /V') DO (
+	FOR /F "delims=" %%I IN ('DIR /B/A:-D-H-S/S REPLACE ^| FINDSTR /C:"\\\." /V') DO (
 		SET "FULLREPLACEPATH=%%I"
 		SET "REPLACEPATH=!FULLREPLACEPATH:%PREP%\REPLACE\=!"
 		SET "REPLACEPATH=!REPLACEPATH:%%~nxi=!"
@@ -1152,7 +1133,7 @@ IF DEFINED NOTEMPTY (
 
 REM Running specific HFTOOLS again.
 IF EXIST HFTOOLS\HFSLIP_POST*.cmd (
-	FOR /F %%I IN ('DIR /B/ON HFTOOLS\HFSLIP_POST*.cmd') DO (CALL HFTOOLS\%%I)
+	FOR /F %%I IN ('DIR /B HFTOOLS\HFSLIP_POST*.cmd') DO (CALL HFTOOLS\%%I)
 )
 
 IF EXIST HFBACKUP\I386 (
@@ -1189,7 +1170,7 @@ ECHO/>CON
 ECHO All hotfixes integrated into a folder called %SOURCESS%.>CON
 ECHO/>CON
 PAUSE>CON
-EXIT
+EXIT /B
 
 REM ---------- Slipstreaming Complete ----------
 
@@ -1218,7 +1199,7 @@ IF %~1 NEQ 1 (
 		ECHO Copy the Windows SOURCE to the SOURCE folder and re-run HFSLIP.>CON
 		ECHO/>CON
 		PAUSE
-		EXIT
+		EXIT /B
 	)
 	SET "NOTEMPTY="
 	
@@ -1279,13 +1260,15 @@ IF /I "%AHTEST%"=="HFCLEANUP" (
 	CALL :MAKEISO
 	RD /Q/S WORK
 	PAUSE>CON
-	EXIT
-) ELSE IF /I "%AHTEST%"=="MAKEISO" IF EXIST %SOURCESS% (
-	SET "T1=AHTEST"
-	TITLE %T1%
-	CALL :MAKEISO
-	PAUSE>CON
-	EXIT
+	EXIT /B
+) ELSE IF /I "%AHTEST%"=="MAKEISO" (
+	IF EXIST %SOURCESS% (
+		SET "T1=AHTEST"
+		TITLE %T1%
+		CALL :MAKEISO
+		PAUSE>CON
+		EXIT /B
+	)
 )
 GOTO :EOF
 REM ---------- ----------
@@ -1311,7 +1294,12 @@ IF "%V1%"=="2000" (
 	)
 ) ELSE IF "%V1%"=="XP" (
 	SET "VERSION=XP"
-	ECHO %V2%|FIND /I "Profess" >NUL 2>&1 && SET "SUBTAG=ip"
+	ECHO %V2% | FIND /I "Profess" >NUL 2>&1
+	IF !ERRORLEVEL! EQU 0 (
+		SET "SUBTAG=ip"
+	) ELSE (
+		(CALL )
+	)
 	IF "%V2%"=="Home" (
 		SET "SUBTAG=ic"
 	) ELSE IF "%V3%"=="familiale" (
@@ -1340,7 +1328,7 @@ IF NOT "%V1%"=="2000" IF "%SUBTAG%"=="" (
 	ECHO Press any key to quit.>CON
 	PAUSE>CON
 	RD /Q/S WORK
-	EXIT
+	EXIT /B
 )
 
 IF EXIST SOURCE\WIN51 (
@@ -1351,15 +1339,15 @@ IF EXIST SOURCE\WIN51 (
 
 REM Check Service Pack version.
 IF EXIST SOURCE\I386\SP*.cat (
-	FOR /F "tokens=2 delims=Pp." %%I IN ('DIR /B/ON SOURCE\I386\SP*.cat') DO (SET /A "SP=%%I")
+	FOR /F "tokens=2 delims=Pp." %%I IN ('DIR /B SOURCE\I386\SP*.cat') DO (SET /A "SP=%%I")
 )
 IF NOT DEFINED SP (
 	IF EXIST SOURCE\cdromsp5.tst (
 		SET /A "SP=4"
 	) ELSE IF EXIST SOURCE\CDROMSP*.TST (
-		FOR /F "tokens=2 delims=Pp." %%I IN ('DIR /B/ON SOURCE\CDROMSP*.TST') DO (SET /A "SP=%%I")
+		FOR /F "tokens=2 delims=Pp." %%I IN ('DIR /B SOURCE\CDROMSP*.TST') DO (SET /A "SP=%%I")
 	) ELSE IF EXIST SOURCE\WIN51*.SP* (
-		FOR /F %%I IN ('DIR /B/ON SOURCE\WIN51*.SP*') DO (ECHO>>SPTMP.txt %%~xI)
+		FOR /F %%I IN ('DIR /B SOURCE\WIN51*.SP*') DO (ECHO>>SPTMP.txt %%~xI)
 		FOR /F "tokens=2 delims=Pp" %%I IN (SPTMP.txt) DO (SET /A "SP=%%I")
 		DEL /Q/F SPTMP.txt
 	)
@@ -1382,12 +1370,12 @@ IF DEFINED NOCLEANSRC (
 	ECHO/>CON
 	ECHO Press any key to quit.>CON
 	PAUSE>NUL
-	EXIT
+	EXIT /B
 )
 
 REM Clean SOURCE SVCPACK folder of non-".cat" files/folders.
 IF EXIST SOURCE\I386\SVCPACK IF NOT EXIST SOURCE\cdromsp5.tst (
-	FOR /F "delims=" %%I IN ('DIR /B/A-D SOURCE\I386\SVCPACK ^| FINDSTR /VIR "\.cat$"') DO (
+	FOR /F "delims=" %%I IN ('DIR /B/A:-D SOURCE\I386\SVCPACK ^| FINDSTR /VIR "\.cat$"') DO (
 		SET /A "NOCLEANSRC=2"
 		DEL /Q/F "SOURCE\I386\SVCPACK\%%I"
 		ECHO Removed SOURCE\I386\SVCPACK\%%I
@@ -1515,10 +1503,14 @@ IF EXIST SOURCE\cdromsp5.tst (
 	FOR /F %%I IN ('FINDSTR /IR /C:"USP 5\.1" SOURCE\cdromsp5.tst') DO (SET "VERSIONIE=2KIE6")
 )
 
-IF "%VERSION%"=="2000" IF %SP% LSS 4 (
-	SET /A "OLDWIN=1"
-) ELSE IF "%VERSION%"=="XP" IF %SP% LSS 2 (
-	SET /A "OLDWIN=1"
+IF "%VERSION%"=="2000" (
+	IF %SP% LSS 4 (
+		SET /A "OLDWIN=1"
+	)
+) ELSE IF "%VERSION%"=="XP" (
+	IF %SP% LSS 2 (
+		SET /A "OLDWIN=1"
+	)
 )
 IF DEFINED OLDWIN (
 	ECHO/>CON
@@ -1537,7 +1529,11 @@ REM ---------- Get Language ----------
 :GETLANG
 IF NOT DEFINED LCIDD IF EXIST SOURCE\I386\FP*0EXT.IN* (
 	FOR /F %%I IN ('DIR /B SOURCE\I386\FP*0EXT.IN*') DO (
-		COPY SOURCE\I386\%%~nI.inf WORK >NUL 2>&1 || EXPAND SOURCE\I386\%%~nI.in_ -R WORK >NUL
+		COPY SOURCE\I386\%%~nI.inf WORK >NUL 2>&1 
+		IF !ERRORLEVEL! NEQ 0 (
+			(CALL )
+			EXPAND SOURCE\I386\%%~nI.in_ -R WORK >NUL
+		)
 		TYPE WORK\%%~nI.inf>WORK\GETLCIDD.txt
 	)
 	FOR /F "tokens=3 delims= " %%I IN ('FINDSTR /BI "FrontPageLangID" WORK\GETLCIDD.txt') DO (SET /A "LCIDD=%%~I")
@@ -1818,16 +1814,24 @@ REM ---------- SYSOC.inf Initialization ----------
 REM Do the SYSOC.in_ file (the seed).
 REM Thanks to LUPO for crafting this unicode stuff to make languages work correctly.
 
-IF DEFINED EE (EXPAND -R %SOURCESS%\I386\SYSOC.in_ WORK)
-IF NOT DEFINED EE IF NOT "%VERSIONIE%"=="FDV" IF EXIST SOURCE\I386\SYSOC.in_ (
-	EXPAND -R SOURCE\I386\SYSOC.in_ WORK >NUL
-) ELSE IF EXIST SOURCE\I386\SYSOC.inf (
-	COPY /Y SOURCE\I386\SYSOC.inf WORK >NUL
+IF DEFINED EE (
+	EXPAND -R %SOURCESS%\I386\SYSOC.in_ WORK
+) ELSE (
+	IF NOT "%VERSIONIE%"=="FDV" (
+		IF EXIST SOURCE\I386\SYSOC.in_ (
+			EXPAND -R SOURCE\I386\SYSOC.in_ WORK >NUL
+		) ELSE IF EXIST SOURCE\I386\SYSOC.inf (
+			COPY /Y SOURCE\I386\SYSOC.inf WORK >NUL
+		)
+	)
 )
 IF "%VERSIONIE%"=="FDV" (MOVE /Y WORK\FDV\SYSOC.in_ WORK\SYSOC.inf)
 REM Edited for flexibility.
 FINDSTR /L "[Version]" WORK\SYSOC.inf >NUL
-IF ERRORLEVEL 1 (SET /A "SYSOCUNI=1")
+IF %ERRORLEVEL% NEQ 0 (
+	(CALL )
+	SET /A "SYSOCUNI=1"
+)
 ECHO/>WORK\SYSOCOC.txt
 ECHO>>WORK\SYSOCOC.txt [Components]
 GOTO :EOF
@@ -1888,7 +1892,7 @@ REM )
 ECHO/>>WORK\HFREGWU.txt
 ECHO>>WORK\HFREGWU.txt [HFSLIPREG]
 ECHO>>WORK\HFREGWU.txt HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\HFSLIPTotalSlipstream","DisplayName",0,"HFSLIP Total Slipstream (%HFSVER%-%HFSBUILD%)"
-ECHO>>WORK\HFREGWU.txt HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\HFSLIPTotalSlipstream","UninstallString",0,"CMD /C ECHO>ER.REG REGEDIT4&ECHO>>ER.REG [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\HFSLIPTotalSlipstream]&REGEDIT /S ER.REG&DEL /Q/F ER.REG"
+ECHO>>WORK\HFREGWU.txt HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\HFSLIPTotalSlipstream","UninstallString",0,"CMD /C ECHO>ER.reg REGEDIT4&ECHO>>ER.reg [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\HFSLIPTotalSlipstream]&REGEDIT /S ER.reg&DEL /Q/F ER.reg"
 
 REM TODO Wouldn't evgnb's patches make these irrelevant, or are they complimentary?
 
@@ -1933,12 +1937,12 @@ REM ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd SET HFSLIPSVC=%%~dp0
 ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd @ECHO OFF
 IF DEFINED CMDHIDE (ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd !CMDHIDE!)
 ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd TITLE HFSLIP
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd FOR %%%%I IN ^(C D E F G H I J K L M N O P Q R S T U V W X Y Z^) DO (
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 	IF EXIST %%%%I:\%MBOOTPATH%I386\SVCPACK ^(
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd FOR %%%%I IN (C D E F G H I J K L M N O P Q R S T U V W X Y Z) DO (
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 	IF EXIST %%%%I:\%MBOOTPATH%I386\SVCPACK (
 ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 		SET "HFSLIP=%%%%I:\%MBOOTPATH%I386\"
 ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 		SET "HFSLIPSVC=%%%%I:\%MBOOTPATH%I386\SVCPACK\"
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 	^)
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd ^)
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 	)
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd )
 
 GOTO :EOF
 REM ---------- ----------
@@ -2005,46 +2009,62 @@ IF "%VERSION%"=="XP" (
 	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.inf = 1,,,,,,,999,0,0
 	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.inf
 )
-IF EXIST WORK\CABS\FlashUt*.exe FOR /F %%I IN ('DIR /B WORK\CABS\FlashUt*.exe') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.exe
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.exe = 1,,,,,,,1003,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.exe
+IF EXIST WORK\CABS\FlashUt*.exe (
+	FOR /F %%I IN ('DIR /B WORK\CABS\FlashUt*.exe') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.exe
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.exe = 1,,,,,,,1003,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.exe
+	)
 )
-IF EXIST WORK\CABS\FlashUt*.dll FOR /F %%I IN ('DIR /B WORK\CABS\FlashUt*.dll') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.dll
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.dll = 1,,,,,,,1003,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.dll
+IF EXIST WORK\CABS\FlashUt*.dll (
+	FOR /F %%I IN ('DIR /B WORK\CABS\FlashUt*.dll') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.dll
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.dll = 1,,,,,,,1003,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.dll
+	)
 )
-IF EXIST WORK\CABS\FlashPlayerUpdateService.exe FOR /F %%I IN ('DIR /B WORK\CABS\FlashPlayerUpdateService.exe') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.svc
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.svc = 1,,,,,,,1003,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.svc
+IF EXIST WORK\CABS\FlashPlayerUpdateService.exe (
+	FOR /F %%I IN ('DIR /B WORK\CABS\FlashPlayerUpdateService.exe') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.svc
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.svc = 1,,,,,,,1003,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.svc
+	)
 )
-IF EXIST WORK\CABS\activex.vch FOR /F %%I IN ('DIR /B WORK\CABS\activex.vch') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\activex.vch
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif activex.vch = 1,,,,,,,1003,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,activex.vch
+IF EXIST WORK\CABS\activex.vch (
+	FOR /F %%I IN ('DIR /B WORK\CABS\activex.vch') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\activex.vch
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif activex.vch = 1,,,,,,,1003,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,activex.vch
+	)
 )
-IF EXIST WORK\CABS\mms.cfg FOR /F %%I IN ('DIR /B WORK\CABS\mms.cfg') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.cfg
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.cfg = 1,,,,,,,1003,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.cfg
+IF EXIST WORK\CABS\mms.cfg (
+	FOR /F %%I IN ('DIR /B WORK\CABS\mms.cfg') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.cfg
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.cfg = 1,,,,,,,1003,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.cfg
+	)
 )
-IF EXIST WORK\CABS\Flash*.cpl FOR /F %%I IN ('DIR /B WORK\CABS\Flash*.cpl') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.cpl
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.cpl = 1,,,,,,,2,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.cpl
+IF EXIST WORK\CABS\Flash*.cpl (
+	FOR /F %%I IN ('DIR /B WORK\CABS\Flash*.cpl') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\swflash.cpl
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.cpl = 1,,,,,,,2,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.cpl
+	)
 )
-IF EXIST WORK\CABS\FlashPlayerApp.exe FOR /F %%I IN ('DIR /B WORK\CABS\FlashPlayerApp.exe') DO (
-	MOVE /Y WORK\CABS\%%I WORK\I386E\swflcpl.exe
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflcpl.exe = 1,,,,,,,2,0,0,%%I
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflcpl.exe
+IF EXIST WORK\CABS\FlashPlayerApp.exe (
+	FOR /F %%I IN ('DIR /B WORK\CABS\FlashPlayerApp.exe') DO (
+		MOVE /Y WORK\CABS\%%I WORK\I386E\swflcpl.exe
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflcpl.exe = 1,,,,,,,2,0,0,%%I
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflcpl.exe
+	)
 )
-IF EXIST WORK\CABS\*.job FOR /F "delims=" %%I IN ('DIR /B WORK\CABS\*.job') DO (
-		SET /A "TXTDIR37=1"
-	MOVE /Y "WORK\CABS\%%I" WORK\I386E\swflash.job
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.job = 1,,,,,,,1037,0,0,"%%I"
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.job
+IF EXIST WORK\CABS\*.job (
+	SET /A "TXTDIR37=1"
+	FOR /F "delims=" %%I IN ('DIR /B WORK\CABS\*.job') DO (
+		MOVE /Y "WORK\CABS\%%I" WORK\I386E\swflash.job
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif swflash.job = 1,,,,,,,1037,0,0,"%%I"
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,swflash.job
+	)
 )
 
 ECHO>>%SOURCESS%\I386\TXTSETUP.sif %FLASHOCX% = 1,,,,,,,1003,0,0,%FLASHOCXN%
@@ -2077,7 +2097,7 @@ IF EXIST HFSVCPACK_SW1\*.msi (
 	ECHO MSI Files.
 	ECHO/
 	
-	FOR /F %%I IN ('DIR /B/ON HFSVCPACK_SW1\*.msi') DO (
+	FOR /F %%I IN ('DIR /B HFSVCPACK_SW1\*.msi') DO (
 		ECHO %%I
 		ECHO>>WORK\HFSLIPCMDP1.cmd MSIEXEC /i %%HFSLIPSVC%%%%I /qn /norestart ALLUSERS=1
 	)
@@ -2090,7 +2110,7 @@ IF EXIST WORK\MCERU1.exe (
 	MOVE WORK\MCERU1.exe %SOURCESS%\I386 >NUL
 	IF EXIST HF\*Center2005* (
 		SET /A "MCEUP=1"
-		FOR /F %%I IN ('DIR /B/ON HF\*Center2005*') DO (
+		FOR /F %%I IN ('DIR /B HF\*Center2005*') DO (
 			IF NOT "%%I"=="%MCERUEXE%" (
 				ECHO>>WORK\HFSLPGUI.txt MCEUP!MCEUP!.exe %SW1% /n
 				ECHO>>%SOURCESS%\I386\TXTSETUP.sif MCEUP!MCEUP!.exe = 1,,,,,,,999,0,0
@@ -2109,7 +2129,7 @@ IF DEFINED GUICNT (
 	ECHO Processing GUIRunOnce Apps
 	ECHO/
 	
-	FOR /F "delims=" %%I IN ('DIR /B/ON HFGUIRUNONCE') DO (
+	FOR /F "delims=" %%I IN ('DIR /B HFGUIRUNONCE') DO (
 		IF /I "%%~xI"==".msi" (
 			ECHO %%I
 			ECHO>>WORK\HFSLPGUI.txt MSIEXEC /i %%I /qn /norestart ALLUSERS=1
@@ -2128,12 +2148,12 @@ IF DEFINED GUICNT (
 			ECHO>>%SOURCESS%\I386\TXTSETUP.sif HFGUI!GUICNT!.cmd = 1,,,,,,,999,0,0,"%%I"
 			ECHO>>%SOURCESS%\I386\DOSNET.inf d1,HFGUI!GUICNT!.cmd
 			COPY "HFGUIRUNONCE\%%I" WORK\I386E\HFGUI!GUICNT!.cmd >NUL
-		) ELSE IF /I "%%~xI"==".REG" (
+		) ELSE IF /I "%%~xI"==".reg" (
 			ECHO %%I
 			ECHO>>WORK\HFSLPGUI.txt REGEDIT /S "%%I"
-			ECHO>>%SOURCESS%\I386\TXTSETUP.sif HFGUI!GUICNT!.REG = 1,,,,,,,999,0,0,"%%I"
-			ECHO>>%SOURCESS%\I386\DOSNET.inf d1,HFGUI!GUICNT!.REG
-			COPY "HFGUIRUNONCE\%%I" WORK\I386E\HFGUI!GUICNT!.REG >NUL
+			ECHO>>%SOURCESS%\I386\TXTSETUP.sif HFGUI!GUICNT!.reg = 1,,,,,,,999,0,0,"%%I"
+			ECHO>>%SOURCESS%\I386\DOSNET.inf d1,HFGUI!GUICNT!.reg
+			COPY "HFGUIRUNONCE\%%I" WORK\I386E\HFGUI!GUICNT!.reg >NUL
 		) ELSE IF /I "%%~xI"==".inf" (
 			ECHO %%I
 			ECHO>>WORK\HFSLPGUI.txt rundll32.exe advpack.dll,LaunchINFSection %%I,DefaultInstall
@@ -2146,7 +2166,7 @@ IF DEFINED GUICNT (
 	SET "GUICNT="
 	TITLE %T1%
 )
-FOR /F %%I IN ('DIR /B/ON HFINFS\*.inf') DO (
+FOR /F %%I IN ('DIR /B HFINFS\*.inf') DO (
 	COPY "HFINFS\%%I" %SOURCESS%\I386 >NUL
 	ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I = 1,,,,,,,999,0,0
 	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I
@@ -2203,11 +2223,11 @@ IF EXIST WORK\SUPPCABNEW (
 	CALL :UNICAB1
 	ECHO>>UC.ddf .Set CabinetNameTemplate=SUPPORT.cab
 	ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\SUPPORT\TOOLS
-	FOR /F %%I IN ('DIR /B/ON WORK\SUPPCAB') DO (ECHO>>UC.ddf WORK\SUPPCAB\%%I)
+	FOR /F %%I IN ('DIR /B WORK\SUPPCAB') DO (ECHO>>UC.ddf WORK\SUPPCAB\%%I)
 	CALL :UNICAB2
 	ECHO/
 )
-FOR /F %%I IN ('DIR /B/A-D/ON WORK\I386E') DO (
+FOR /F %%I IN ('DIR /B/A:-D WORK\I386E') DO (
 	ECHO Processing %%I...
 	IF EXIST %SOURCESS%\I386\%%I (
 		COPY /Y WORK\I386E\%%I %SOURCESS%\I386 >NUL
@@ -2218,9 +2238,9 @@ FOR /F %%I IN ('DIR /B/A-D/ON WORK\I386E') DO (
 ECHO/
 ECHO Locating compressed files in I386 subfolders
 SET "BASEDIR=%SOURCESS%\I386\"
-DIR /B/AD %SOURCESS%\I386>WORK\SSSI386SUB0.txt
+DIR /B/A:D %SOURCESS%\I386>WORK\SSSI386SUB0.txt
 FINDSTR /VBI "SVCPACK" WORK\SSSI386SUB0.txt>WORK\SSSI386SUB.txt
-FOR /F "delims=" %%I IN (WORK\SSSI386SUB.txt) DO (DIR /B/S/A-D/ON "%SOURCESS%\I386\%%I">>WORK\SSSI386SUBALL.txt)
+FOR /F "delims=" %%I IN (WORK\SSSI386SUB.txt) DO (DIR /B/A:-D/S "%SOURCESS%\I386\%%I">>WORK\SSSI386SUBALL.txt)
 FINDSTR /ER "_" WORK\SSSI386SUBALL.txt>WORK\COMPRESSED.txt
 FOR /F %%I IN (WORK\COMPRESSED.txt) DO (SET /A "COMPRESSED=1")
 IF DEFINED COMPRESSED (
@@ -2246,7 +2266,7 @@ IF DEFINED COMPRESSED (
 SET "BASEDIR=%~dp0"
 ECHO/
 ECHO Locating remaining subfolder files
-FOR /F %%I IN ('DIR /B/AD WORK\I386E') DO (
+FOR /F %%I IN ('DIR /B/A:D WORK\I386E') DO (
 	IF EXIST %SOURCESS%\I386\%%I (XCOPY /EHY WORK\I386E\%%I %SOURCESS%\I386\%%I >NUL)
 )
 
@@ -2320,25 +2340,25 @@ ECHO/>>SVCPACK.inf
 ECHO>>SVCPACK.inf [SetupHotfixesToRun]
 IF "%INSTALLRC%"=="1" (ECHO>>SVCPACK.inf "..\winnt32.exe /cmdcons /dudisable /unattend")
 IF EXIST HFSVCPACK\*.exe (
-	FOR /F "delims=" %%I IN ('DIR /B/ON HFSVCPACK\*.exe') DO (ECHO>>SVCPACK.inf %%I)
+	FOR /F "delims=" %%I IN ('DIR /B HFSVCPACK\*.exe') DO (ECHO>>SVCPACK.inf %%I)
 )
 
 
 REM Tweaks
 REM 2020-08-07: bugfix - "in Windows 2000 %path% during installation is only in system32, so you need to specify the full path."
-IF EXIST HFSVCPACK\*.REG (
-	FOR /F "delims=" %%I IN ('DIR /B/ON HFSVCPACK\*.REG') DO (ECHO>>WORK\HFSLIPCMDP1.cmd %%SYSTEMROOT%%\regedit.exe /s "%%HFSLIPSVC%%%%I")
+IF EXIST HFSVCPACK\*.reg (
+	FOR /F "delims=" %%I IN ('DIR /B HFSVCPACK\*.reg') DO (ECHO>>WORK\HFSLIPCMDP1.cmd %%SYSTEMROOT%%\regedit.exe /s "%%HFSLIPSVC%%%%I")
 )
 IF EXIST HFSVCPACK\*.inf (
-	FOR /F "delims=" %%I IN ('DIR /B/ON HFSVCPACK\*.inf') DO (ECHO>>WORK\HFSLIPCMDP1.cmd rundll32.exe advpack.dll,LaunchINFSection %%HFSLIPSVC%%%%I,,1)
+	FOR /F "delims=" %%I IN ('DIR /B HFSVCPACK\*.inf') DO (ECHO>>WORK\HFSLIPCMDP1.cmd rundll32.exe advpack.dll,LaunchINFSection %%HFSLIPSVC%%%%I,,1)
 )
 
 
 IF EXIST HFSVCPACK_SW1\*.exe (
-	FOR /F "delims=" %%I IN ('DIR /B/ON HFSVCPACK_SW1\*.exe') DO (ECHO>>SVCPACK.inf %%I %SW1%)
+	FOR /F "delims=" %%I IN ('DIR /B HFSVCPACK_SW1\*.exe') DO (ECHO>>SVCPACK.inf %%I %SW1%)
 )
 IF EXIST HFSVCPACK_SW2\*.exe (
-	FOR /F "delims=" %%I IN ('DIR /B/ON HFSVCPACK_SW2\*.exe') DO (
+	FOR /F "delims=" %%I IN ('DIR /B HFSVCPACK_SW2\*.exe') DO (
 		IF /I NOT "%%I"=="MP10Setup.exe" (ECHO>>SVCPACK.inf %%I %SW2%)
 	)
 )
@@ -2377,7 +2397,7 @@ IF EXIST %SOURCESS%\I386\SVCPACK\IE7_INST.exe (
 		ECHO>>SVCPACK.inf IE7_INST.exe %SW1% /update-no%IE7BKPSW%
 	)
 )
-IF EXIST HFSVCPACK\*.cmd (DIR /B/ON HFSVCPACK\*.cmd>>SVCPACK.inf)
+IF EXIST HFSVCPACK\*.cmd (DIR /B HFSVCPACK\*.cmd>>SVCPACK.inf)
 IF EXIST WORK\SVCMAIN.txt (
 	FOR /F %%I IN (WORK\SVCMAIN.txt) DO (ECHO>>WORK\SVCBASE.txt %%I)
 	FINDSTR /VBI /G:WORK\SVCBASE.txt SVCPACK.inf>WORK\SVCREAL.txt
@@ -2426,7 +2446,7 @@ IF DEFINED DRVUPD (
 IF EXIST HFEXPERT\SPXCAB (CALL :HFEDRVCAB)
 FINDSTR /IR "\[driver \[sp \." SOURCE\I386\DRVINDEX.inf>WORK\DRVCAB1.txt
 FINDSTR /VR "=" WORK\DRVCAB1.txt>WORK\DRVCAB.txt
-DIR /B/ON WORK\SPXCAB>WORK\SPXCABFILES.txt
+DIR /B WORK\SPXCAB>WORK\SPXCABFILES.txt
 FOR /F "tokens=2,3* delims== " %%I IN ('FINDSTR /BI Cabfiles SOURCE\I386\DRVINDEX.inf') DO (SET "CABFILESLINE=%%I")
 ECHO>%SOURCESS%\I386\DRVINDEX.inf [Version]
 ECHO>>%SOURCESS%\I386\DRVINDEX.inf Signature="$Windows NT$"
@@ -2441,7 +2461,7 @@ SET "CABFILESLINE="
 CALL :UNICAB1
 ECHO>>UC.ddf .Set CabinetNameTemplate=SPX.cab
 ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-FOR /F %%I IN ('DIR /B/ON WORK\SPXCAB') DO (ECHO>>UC.ddf WORK\SPXCAB\%%I)
+FOR /F %%I IN ('DIR /B WORK\SPXCAB') DO (ECHO>>UC.ddf WORK\SPXCAB\%%I)
 CALL :UNICAB2
 FINDSTR /VBI DriverCabName %SOURCESS%\I386\TXTSETUP.sif>TXTSETUP.sif
 ECHO>>TXTSETUP.sif SPX.cab = 1,,,,,,_x,39,0,0
@@ -2823,14 +2843,14 @@ REM ECHO>>WORK\HFSLIP.cmd.txt    ATTRIB -R %%SYSTEMROOT%%\*.TMP
 REM ECHO>>WORK\HFSLIP.cmd.txt    DEL /Q/F %%SYSTEMROOT%%\*.TMP
 REM ECHO>>WORK\HFSLIP.cmd.txt ^)
 REM ECHO>>WORK\HFSLIP.cmd.txt GOTO :EOF
-REM ECHO>>WORK\HFSLIP.cmd.txt EXIT
+REM ECHO>>WORK\HFSLIP.cmd.txt EXIT /B
 
 ECHO/>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd IF EXIST %%SYSTEMROOT%%\*.TMP ^(
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd IF EXIST %%SYSTEMROOT%%\*.TMP (
 ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 	ATTRIB -R %%SYSTEMROOT%%\*.TMP
 ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd 	DEL /Q/F %%SYSTEMROOT%%\*.TMP
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd ^)
-ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd EXIT /b
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd )
+ECHO>>%SOURCESS%\I386\SVCPACK\HFSLIP.cmd EXIT /B /b
 
 REM ECHO/>>%SOURCESS%\I386\HFSLPGUI.cmd
 REM TYPE WORK\HFSLIP.cmd.txt>>%SOURCESS%\I386\HFSLPGUI.cmd
@@ -2855,13 +2875,13 @@ REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd TYPE SSIP1.txt^>SSIP2.txt
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd FOR /F %%%%I IN ^('FINDSTR /IR "SystemSetupInProgress.=dword:00000000" SSIP2.txt'^) DO ^(SET SSIP=N^)
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd IF "%%SSIP%%"=="Y" ^(rundll32.exe advpack.dll,LaunchINFSection %%SYSTEMROOT%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Run^)
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd GOTO :EOF
-REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT
+REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT /B
 REM ECHO/>>%SOURCESS%\I386\HFSLPGUI.cmd
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd :RUNONCE
 REM TYPE WORK\HFSLPGUI.txt>>%SOURCESS%\I386\HFSLPGUI.cmd
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd rundll32.exe advpack.dll,LaunchINFSection %%WINDIR%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Rem
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd GOTO :EOF
-REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT
+REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT /B
 
 REM 2020-08-07: "W2k does not understand the RegisterDlls directive in inf files, so we move it to a separate batch file:"
 REM ECHO/>>%SOURCESS%\I386\HFSLPGUI.cmd
@@ -2872,7 +2892,7 @@ REM 	ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd ::REGISTER FILES
 REM 	TYPE WORK\RGSVRWU.txt>>%SOURCESS%\I386\HFSLPGUI.cmd
 REM )
 REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd GOTO :EOF
-REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT
+REM ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT /B
 REM ECHO>>%SOURCESS%\I386\TXTSETUP.sif HFSLPGUI.cmd = 1,,,,,,,999,0,0
 REM ECHO>>%SOURCESS%\I386\DOSNET.inf d1,HFSLPGUI.cmd
 
@@ -2882,14 +2902,14 @@ ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd CD %%SYSTEMROOT%%\HFSLIP
 ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd SET SSIP=Y
 ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd %%SYSTEMROOT%%\REGEDIT /S/E SSIP1.txt "HKEY_LOCAL_MACHINE\SYSTEM\Setup"
 ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd TYPE SSIP1.txt^>SSIP2.txt
-ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd FOR /F %%%%I IN ^('FINDSTR /IR "SystemSetupInProgress.=dword:00000000" SSIP2.txt'^) DO ^(SET "SSIP=N"^)
-ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd IF "%%SSIP%%"=="Y" ^(
+ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd FOR /F %%%%I IN ('FINDSTR /IR "SystemSetupInProgress.=dword:00000000" SSIP2.txt') DO (SET "SSIP=N")
+ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd IF "%%SSIP%%"=="Y" (
 ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd 	rundll32.exe advpack.dll,LaunchINFSection %%SYSTEMROOT%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Run
-ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd 	EXIT /b
-ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd ^)
+ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd 	EXIT /B /b
+ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd )
 TYPE WORK\HFSLPGUI.txt>>%SOURCESS%\I386\HFSLPGUI.cmd
 ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd rundll32.exe advpack.dll,LaunchINFSection %%WINDIR%%\HFSLIP\HFSLPGUI.inf,HFSLIPGUI_Rem
-ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT /b
+ECHO>>%SOURCESS%\I386\HFSLPGUI.cmd EXIT /B /b
 ECHO>>%SOURCESS%\I386\TXTSETUP.sif HFSLPGUI.cmd = 1,,,,,,,999,0,0
 ECHO>>%SOURCESS%\I386\DOSNET.inf d1,HFSLPGUI.cmd
 
@@ -2906,7 +2926,7 @@ ECHO/
 CALL :UNICAB1
 ECHO>>UC.ddf .Set CabinetNameTemplate=DRIVER.cab
 ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-FOR /F %%I IN ('DIR /B/ON %SOURCESS%\I386\DRIVER') DO (ECHO>>UC.ddf %SOURCESS%\I386\DRIVER\%%I)
+FOR /F %%I IN ('DIR /B %SOURCESS%\I386\DRIVER') DO (ECHO>>UC.ddf %SOURCESS%\I386\DRIVER\%%I)
 
 ECHO Creating new DRIVER.cab...
 MAKECAB /F UC.ddf
@@ -2916,7 +2936,7 @@ ECHO>%SOURCESS%\I386\DRVINDEX.inf [Version]
 ECHO>>%SOURCESS%\I386\DRVINDEX.inf Signature="$Windows NT$"
 ECHO>>%SOURCESS%\I386\DRVINDEX.inf CabFiles=driver
 ECHO>>%SOURCESS%\I386\DRVINDEX.inf [driver]
-DIR /B/ON %SOURCESS%\I386\DRIVER>>%SOURCESS%\I386\DRVINDEX.inf
+DIR /B %SOURCESS%\I386\DRIVER>>%SOURCESS%\I386\DRVINDEX.inf
 ECHO>>%SOURCESS%\I386\DRVINDEX.inf [Cabs]
 ECHO>>%SOURCESS%\I386\DRVINDEX.inf driver=DRIVER.cab
 RD /Q/S %SOURCESS%\I386\DRIVER
@@ -3313,7 +3333,7 @@ HF\%IE7EXE% /Q /X:WORK\IE7
 SET /A "IE7HFX=1"
 IF EXIST HF\IE7*-KB*.exe (
 	ECHO Integrating MSIE7 hotfixes from HF folder
-	FOR /F %%I IN ('DIR /B/ON HF\IE7*-KB*.exe') DO (
+	FOR /F %%I IN ('DIR /B HF\IE7*-KB*.exe') DO (
 		ECHO %%I
 		HF\%%I /Q /X:TEMP
 		CALL :IE7INTCOPY
@@ -3332,7 +3352,7 @@ IF EXIST HF\IE7*-KB*.exe (
 SET "IE7INFINS="
 IF EXIST HF\BASIC\IE7*-KB*.exe (
 	ECHO Integrating MSIE7 hotfixes from HF\BASIC folder
-	FOR /F %%I IN ('DIR /B/ON HF\BASIC\IE7*-KB*.exe') DO (
+	FOR /F %%I IN ('DIR /B HF\BASIC\IE7*-KB*.exe') DO (
 		ECHO %%I
 		HF\BASIC\%%I /Q /X:TEMP
 		CALL :IE7INTCOPY
@@ -3343,7 +3363,7 @@ IF EXIST HF\BASIC\IE7*-KB*.exe (
 )
 IF EXIST HF\NOREG\IE7*-KB*.exe (
 	ECHO Integrating MSIE7 hotfixes from HF\NOREG folder
-	FOR /F %%I IN ('DIR /B/ON HF\NOREG\IE7*-KB*.exe') DO (
+	FOR /F %%I IN ('DIR /B HF\NOREG\IE7*-KB*.exe') DO (
 		ECHO %%I
 		HF\NOREG\%%I /Q /X:TEMP
 		CALL :IE7INTCOPY
@@ -3386,7 +3406,7 @@ IF EXIST WORK\IE7\ieframe2.dll (
 	ECHO>>WORK\IE7\SETUP.cmd %%SYSTEMROOT%%\SYSTEM32\REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce" /t REG_EXPAND_SZ /v ZZZieframe1 /d "CMD /C REN %%SYSTEMROOT%%\SYSTEM32\ieframe.dll ieframe.old&REN %%SYSTEMROOT%%\SYSTEM32\ieframe2.dll ieframe.dll" /f
 	ECHO>>WORK\IE7\SETUP.cmd %%SYSTEMROOT%%\SYSTEM32\REG ADD "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce" /t REG_EXPAND_SZ /v ZZZieframe2 /d "CMD /C %%SYSTEMROOT%%\SYSTEM32\REG ADD """HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce""" /t REG_EXPAND_SZ /v ieframeold /d """CMD /C DEL /Q/F %%SYSTEMROOT%%\SYSTEM32\ieframe.old""" /f" /f
 )
-ECHO>>WORK\IE7\SETUP.cmd EXIT /b
+ECHO>>WORK\IE7\SETUP.cmd EXIT /B /b
 ECHO>IE7.SED [Version]
 ECHO>>IE7.SED Class=IEXPRESS
 ECHO>>IE7.SED SEDVersion=3
@@ -3409,7 +3429,7 @@ ECHO>>IE7.SED TargetName=%SOURCESS%\I386%IE7TARGET%\IE7_INST.exe
 ECHO>>IE7.SED FriendlyName=Windows Internet Explorer 7
 ECHO>>IE7.SED AppLaunched=SETUP.cmd
 ECHO>>IE7.SED PostInstallCmd=^<None^>
-FOR /F %%I IN ('DIR /B/A-D WORK\IE7') DO (
+FOR /F %%I IN ('DIR /B/A:-D WORK\IE7') DO (
 	ECHO>>IE7.SED FILE!IE7FCNT!="%%I"
 	ECHO>>IE7b.txt %%FILE!IE7FCNT!%%=
 	SET /A "IE7FCNT+=1"
@@ -3678,7 +3698,7 @@ FOR %%I IN (INSTALL SETUP) DO (
 	IF EXIST WORK\IEBRAND\%%I.inf (DEL /Q/F WORK\IEBRAND\%%I.inf)
 )
 IF EXIST WORK\IEBRAND\*.inf (
-	FOR /F %%I IN ('DIR /B/ON WORK\IEBRAND\*.inf') DO (
+	FOR /F %%I IN ('DIR /B WORK\IEBRAND\*.inf') DO (
 		SET /A "HFSLP+=1"
 		FINDSTR /VI "RequiredEngine" WORK\IEBRAND\%%I>>%SOURCESS%\I386\HFSLP!HFSLP!.inf
 		DEL /Q/F WORK\IEBRAND\%%I
@@ -3697,7 +3717,8 @@ REM ---------- IEACCESS.inf ----------
 :IEACCESS_INF
 EXPAND SOURCE\I386\IEACCESS.in_ -R WORK >NUL
 FINDSTR /L "[ShowIE]" WORK\IEACCESS.inf >NUL
-IF ERRORLEVEL 1 (
+IF %ERRORLEVEL% NEQ 0 (
+	(CALL )
 	ECHO>>IEACCESS.cmd @ECHO OFF
 	ECHO>>IEACCESS.cmd SET "IEACCESS="
 	ECHO>>IEACCESS.cmd FIND /V /I "[Show" WORK\IEACCESS.inf^>WORK\IEACCESS1.inf
@@ -3708,7 +3729,7 @@ IF ERRORLEVEL 1 (
 	ECHO>>IEACCESS.cmd 	IF DEFINED IEACCESS ^(ECHO^>^>WORK\I386E\ieaccess.inf %%%%I^)
 	ECHO>>IEACCESS.cmd 	SET "IEACCESS=1"
 	ECHO>>IEACCESS.cmd ^)
-	ECHO>>IEACCESS.cmd EXIT /b
+	ECHO>>IEACCESS.cmd EXIT /B /b
 	ECHO>>IEACCESS.cmd ECHO^>^>WORK\I386E\ieaccess.inf [ShowIE]
 	ECHO>>IEACCESS.cmd ECHO^>^>WORK\I386E\ieaccess.inf Commandline="%%%%11%%%%\ie4uinit.exe -show"
 	ECHO>>IEACCESS.cmd ECHO^>^>WORK\I386E\ieaccess.inf TickCount=500
@@ -3753,7 +3774,8 @@ ECHO>>MKSDINF.cmd ECHO^>^>%SOURCESS%\I386\HFSLIPSD.inf [Copy.ShowDesktop]
 ECHO>>MKSDINF.cmd ECHO^>^>%SOURCESS%\I386\HFSLIPSD.inf %%%%ShowDesktop%%%%,sdesktop.scf
 EXPAND SOURCE\I386\SHELL.in_ -R WORK >NUL
 FINDSTR /L "ShowDesktop" WORK\SHELL.inf >NUL
-IF ERRORLEVEL 1 (
+IF %ERRORLEVEL% NEQ 0 (
+	(CALL )
 	IF DEFINED NOIE7STRNGSRCH (
 		ECHO>>MKSDINF.cmd TYPE WORK\SHELL.inf^>^>%SOURCESS%\I386\HFSLIPSD.inf
 	) ELSE (
@@ -4036,12 +4058,14 @@ IF "%INCALLSKINS%"=="1" (
 		ECHO>>WORK\HFS_PFWMPSKINS.txt Windows XP.wmz,personal.wmz
 		SET /A "SKINSADDED=1"
 	)
-) ELSE IF "%INCWMPCSKIN%"=="1" IF EXIST SOURCE\I386\CLASSIC.wm* (
-	ECHO>>%SOURCESS%\I386\TXTSETUP.sif Classic.wmz = 1,,,,,,,,3,3
-	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,Classic.wmz
-	ECHO>>WORK\HFSSDF.txt Classic.wmz=1
-	ECHO>>WORK\HFS_PFWMPSKINS.txt Classic.wmz
-	SET /A "SKINSADDED=1"
+) ELSE IF "%INCWMPCSKIN%"=="1" (
+	IF EXIST SOURCE\I386\CLASSIC.wm* (
+		ECHO>>%SOURCESS%\I386\TXTSETUP.sif Classic.wmz = 1,,,,,,,,3,3
+		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,Classic.wmz
+		ECHO>>WORK\HFSSDF.txt Classic.wmz=1
+		ECHO>>WORK\HFS_PFWMPSKINS.txt Classic.wmz
+		SET /A "SKINSADDED=1"
+	)
 )
 IF EXIST TEMP\wmplayer.exe (SET /A "SKINSADDED=1")
 IF DEFINED SKINSADDED (
@@ -4087,7 +4111,13 @@ IF EXIST TEMP\wmburn.exe (
 	IF "%ForceWMP9Streaming%"=="1" (ECHO>>WORK\HFREGWU.txt HKU,".DEFAULT\Software\Microsoft\MediaPlayer\Preferences","ForceOnline",0x10001,1)
 	IF "%LCIDD%"=="1031" (
 		DEL /Q/F TEMP\dwintl.dll
-		IF NOT EXIST WORK\I386E\dwintl.dll (COPY SOURCE\I386\dwintl.dll WORK\I386E >NUL 2>&1 || EXPAND SOURCE\I386\dwintl.dl_ -R WORK\I386E >NUL)
+		IF NOT EXIST WORK\I386E\dwintl.dll (
+			COPY SOURCE\I386\dwintl.dll WORK\I386E >NUL 2>&1
+			IF !ERRORLEVEL! NEQ 0 (
+				(CALL )
+				EXPAND SOURCE\I386\dwintl.dl_ -R WORK\I386E >NUL
+			)
+		)
 	)
 	ECHO>>WORK\HFSDST.txt PFWMPLCID=16422,"Windows Media Player\%WMLNG%"
 	ECHO>>WORK\HFS_PFWMPLCID.txt dwintl.dll,dwil%WMLNG%.dll
@@ -4213,7 +4243,7 @@ IF EXIST TEMP\QuickSi.wmz (
 	ECHO>>WORK\HFS_PFWMP.txt wmlaunch.exe
 	ECHO>>WORK\HFS_PFWMP.txt wmpenc.exe
 	
-	IF %OSLEVEL% EQU 23 DEL /Q/F TEMP\custsat.dll
+	IF %OSLEVEL% EQU 23 (DEL /Q/F TEMP\custsat.dll)
 	IF "%VERSION%"=="XP" IF %SP% EQU 1 (
 		REM *@*
 		REM ECHO>>WORK\RGSVRWU.txt regsvr32.exe /s "%%ProgramFiles%%\Windows Media Player\mpvis.dll"
@@ -4430,7 +4460,7 @@ IF EXIST TEMP\wpdmtp*.inf (MOVE /Y TEMP\wpdmtp*.inf WORK\I386E >NUL)
 IF EXIST TEMP\*.cat (MOVE /Y TEMP\*.cat WORK\SVCPACK >NUL)
 
 IF EXIST TEMP\*.inf (
-	FOR /F %%I IN ('DIR /B/ON TEMP\*.inf') DO (
+	FOR /F %%I IN ('DIR /B TEMP\*.inf') DO (
 		SET /A "HFSLP+=1"
 		SET "HFSLP2=%%I"
 		CALL :WMPINFCREATOR
@@ -4567,6 +4597,7 @@ IF EXIST HFCABS\_DX9core_%VERSION%SP%SP%_HFSLIP.cab (
 	IF %OSLEVEL% GEQ 31 (
 		CALL :DX9C_PREP
 	) ELSE (
+		REM TODO: This is terrible. It should be CALLed, but checked for a return error.
 		GOTO :DX9C_BASIC
 	)
 )
@@ -4854,20 +4885,20 @@ ECHO/
 
 SET /A "HFDX=130"
 IF EXIST HFCABS\*d3d*_x86.cab (
-	FOR /F %%I IN ('DIR /B/A-D/ON HFCABS\*d3d*_x86.cab') DO (EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL)
+	FOR /F %%I IN ('DIR /B/A:-D HFCABS\*d3d*_x86.cab') DO (EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL)
 )
 IF EXIST HFCABS\*xinput_x86.cab (
-	FOR /F %%I IN ('DIR /B/A-D/ON HFCABS\*xinput_x86.cab') DO (EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL)
+	FOR /F %%I IN ('DIR /B/A:-D HFCABS\*xinput_x86.cab') DO (EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL)
 )
 IF EXIST HFCABS\*XAudio_x86.cab (
-	FOR /F %%I IN ('DIR /B/A-D/ON HFCABS\*XAudio_x86.cab') DO (EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL)
+	FOR /F %%I IN ('DIR /B/A:-D HFCABS\*XAudio_x86.cab') DO (EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL)
 )
 IF EXIST %SOURCESS%\I386\HFSLIPDY.inf IF EXIST HFCABS\dxdllreg_x86.cab (
 	EXPAND HFCABS\dxdllreg_x86.cab -F:* WORK\DX9EXTRA >NUL
 	ECHO>>%SOURCESS%\I386\HFSLIPDY.inf HKLM,"SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnceEx\ZZZ","110",,"%%11%%\dxdllreg.exe -PATCH"
 )
 IF EXIST HFCABS\*XACT_x86.cab (
-	FOR /F %%I IN ('DIR /B/A-D/ON HFCABS\*XACT_x86.cab') DO (
+	FOR /F %%I IN ('DIR /B/A:-D HFCABS\*XACT_x86.cab') DO (
 		EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL
 		IF EXIST WORK\DX9EXTRA\x3da* (
 			XCOPY /DHY WORK\DX9EXTRA\x3da* WORK\DX9_X3DA >NUL
@@ -4876,28 +4907,28 @@ IF EXIST HFCABS\*XACT_x86.cab (
 	)
 )
 IF EXIST HFCABS\*X3DAudio_x86.cab (
-	FOR /F %%I IN ('DIR /B/A-D/ON HFCABS\*X3DAudio_x86.cab') DO (
+	FOR /F %%I IN ('DIR /B/A:-D HFCABS\*X3DAudio_x86.cab') DO (
 		EXPAND HFCABS\%%I -F:* WORK\DX9EXTRA >NUL
 		XCOPY /DHY WORK\DX9EXTRA\x3da* WORK\DX9_X3DA >NUL
 		DEL /Q/F WORK\DX9EXTRA\x3da*
 	)
 )
 IF EXIST WORK\DX9EXTRA\d3dx10_* (
-	FOR /F "tokens=2* delims=_" %%I IN ('DIR /B/A-D/ON WORK\DX9EXTRA\d3dx10_*.dll') DO (
+	FOR /F "tokens=2* delims=_" %%I IN ('DIR /B/A:-D WORK\DX9EXTRA\d3dx10_*.dll') DO (
 		REN WORK\DX9EXTRA\d3dx10_%%I d3d10_%%I
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif d3d10_%%I = 1,,,,,,,2,0,0,d3dx10_%%I
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,d3d10_%%I
 	)
 )
 IF EXIST WORK\DX9EXTRA\d3dcompiler* (
-	FOR /F "tokens=2* delims=_" %%I IN ('DIR /B/A-D/ON WORK\DX9EXTRA\d3dcompiler*.dll') DO (
+	FOR /F "tokens=2* delims=_" %%I IN ('DIR /B/A:-D WORK\DX9EXTRA\d3dcompiler*.dll') DO (
 		REN WORK\DX9EXTRA\d3dcompiler_%%I d3dco_%%I
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif d3dco_%%I = 1,,,,,,,2,0,0,d3dcompiler_%%I
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,d3dco_%%I
 	)
 )
 IF EXIST WORK\DX9EXTRA\d3dcsx* (
-	FOR /F "tokens=2* delims=_" %%I IN ('DIR /B/A-D/ON WORK\DX9EXTRA\d3dcsx*.dll') DO (
+	FOR /F "tokens=2* delims=_" %%I IN ('DIR /B/A:-D WORK\DX9EXTRA\d3dcsx*.dll') DO (
 		REN WORK\DX9EXTRA\d3dcsx_%%I d3dcsx_%%I
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif d3dcsx_%%I = 1,,,,,,,2,0,0,d3dcsx_%%I
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,d3dcsx_%%I
@@ -4909,14 +4940,14 @@ IF EXIST WORK\DX9EXTRA\xinput9_1_0.dll (
 	ECHO>>%SOURCESS%\I386\DOSNET.inf d1,xinp1_0.dll
 )
 IF EXIST WORK\DX9EXTRA\xinput*.dll (
-	FOR /F "tokens=1,2* delims=ut" %%I IN ('DIR /B/ON WORK\DX9EXTRA\xinput*.dll') DO (
+	FOR /F "tokens=1,2* delims=ut" %%I IN ('DIR /B WORK\DX9EXTRA\xinput*.dll') DO (
 		REN "WORK\DX9EXTRA\%%Iut%%J" %%I%%J
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I%%J = 1,,,,,,,2,0,0,%%Iut%%J
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I%%J
 	)
 )
 IF EXIST WORK\DX9EXTRA\xact*.dll (
-	FOR /F "tokens=1,2* delims=gine" %%I IN ('DIR /B/ON WORK\DX9EXTRA\xact*.dll') DO (
+	FOR /F "tokens=1,2* delims=gine" %%I IN ('DIR /B WORK\DX9EXTRA\xact*.dll') DO (
 		REN "WORK\DX9EXTRA\%%Iengine%%J" %%I%%J
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I%%J = 1,,,,,,,2,0,0,%%Iengine%%J
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I%%J
@@ -4927,14 +4958,15 @@ IF EXIST WORK\DX9EXTRA\xact*.dll (
 	)
 )
 IF EXIST WORK\DX9EXTRA\XAPOFX*.dll (
-	FOR /F "tokens=1,2 delims=_" %%I IN ('DIR /B/ON/L WORK\DX9EXTRA\XAPOFX*.dll') DO (
+	REM TODO: Wonder why lowercase is important here...
+	FOR /F "tokens=1,2 delims=_" %%I IN ('DIR /B/L WORK\DX9EXTRA\XAPOFX*.dll') DO (
 		REN "WORK\DX9EXTRA\%%I_%%J" %%I%%J
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I%%J = 1,,,,,,,2,0,0,%%I_%%J
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I%%J
 	)
 )
 IF EXIST WORK\DX9EXTRA\XAudio*.dll (
-	FOR /F "tokens=1,2* delims=io" %%I IN ('DIR /B/ON WORK\DX9EXTRA\XAudio*.dll') DO (
+	FOR /F "tokens=1,2* delims=io" %%I IN ('DIR /B WORK\DX9EXTRA\XAudio*.dll') DO (
 		REN "WORK\DX9EXTRA\%%Iio%%J" %%I%%J
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I%%J = 1,,,,,,,2,0,0,%%Iio%%J
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I%%J
@@ -4951,7 +4983,7 @@ IF EXIST WORK\DX9EXTRA\*.dll (XCOPY /DHY WORK\DX9EXTRA WORK\I386E)
 IF EXIST WORK\DX9_X3DA\*.dll (
 	IF EXIST WORK\DX9_X3DA\*.inf (DEL /Q/F WORK\DX9_X3DA\*.inf)
 	IF EXIST WORK\DX9_X3DA\*.cat (MOVE /Y WORK\DX9_X3DA\*.cat WORK\SVCPACK)
-	FOR /F "tokens=1,2,3* delims=uo" %%I IN ('DIR /B/ON WORK\DX9_X3DA') DO (
+	FOR /F "tokens=1,2,3* delims=uo" %%I IN ('DIR /B WORK\DX9_X3DA') DO (
 		REN "WORK\DX9_X3DA\%%Iu%%Jo%%K" %%I%%K
 		ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I%%K = 1,,,,,,,2,0,0,%%Iu%%Jo%%K
 		ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I%%K
@@ -5124,7 +5156,7 @@ ECHO Processing Windows Update Agent
 ECHO/
 
 MD TEMP\WUA
-FOR /F %%I IN ('DIR /B/ON HF\*WindowsUpdateAgent*-x86.exe') DO (SET "WUAHFX=%%I")
+FOR /F %%I IN ('DIR /B HF\*WindowsUpdateAgent*-x86.exe') DO (SET "WUAHFX=%%I")
 HF\%WUAHFX% /Q /X:TEMP
 SET "WUAHFX="
 REM 2020-08-07:
@@ -5175,7 +5207,11 @@ DIR /B TEMP\WUA\*.dll>>WORK\NSFREGt.txt
 XCOPY /DHY TEMP\WUA WORK\I386E
 CALL :CLEANTEMP
 REM Nullifying AU.inf.
-COPY SOURCE\I386\AU.inf WORK >NUL 2>&1 || EXPAND SOURCE\I386\AU.in_ -R WORK >NUL
+COPY SOURCE\I386\AU.inf WORK >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+	(CALL )
+	EXPAND SOURCE\I386\AU.in_ -R WORK >NUL
+)
 TYPE WORK\AU.inf>WORK\AU2.inf
 FINDSTR /R "[;=[]" WORK\AU2.inf>WORK\AU3.inf
 FINDSTR /VR "11,," WORK\AU3.inf>WORK\I386E\AU.inf
@@ -5190,7 +5226,7 @@ ECHO/
 ECHO Processing Microsoft Installer 4.5
 ECHO/
 
-FOR /F %%I IN ('DIR /B/ON HF\Windows%~1-KB942288*-x86.exe') DO (
+FOR /F %%I IN ('DIR /B HF\Windows%~1-KB942288*-x86.exe') DO (
 	SET "MSIHFX=%%I"
 	SET /A "TXTDIR09=1"
 )
@@ -5262,12 +5298,12 @@ ECHO/
 IF NOT "%FORCEXPIZESLIP%"=="1" (
 	IF DEFINED XPIZESW (
 		ECHO>>%SOURCESS%\I386\SVCPACK.inf XPIZE.exe !XPIZESW!
-		FOR /F %%I IN ('DIR /B/ON HF\XPIZE*') DO (COPY /Y HF\%%I %SOURCESS%\I386\SVCPACK\XPIZE.exe >NUL)
+		FOR /F %%I IN ('DIR /B HF\XPIZE*') DO (COPY /Y HF\%%I %SOURCESS%\I386\SVCPACK\XPIZE.exe >NUL)
 	)
 	GOTO :EOF
 )
 
-FOR /F %%I IN ('DIR /B/ON HF\XPIZE*') DO (SET "XPIZE=%%I")
+FOR /F %%I IN ('DIR /B HF\XPIZE*') DO (SET "XPIZE=%%I")
 ECHO Please wait while HFSLIP slipstreams XPize. This may take a while.
 %PREP%\HF\%XPIZE% /S /mode=i386 /source=%SOURCESS%
 SET "XPIZE="
@@ -5469,34 +5505,34 @@ IF DEFINED OUTPUTFILE (
 ECHO>>HFSLIP.log ===============================================================================
 ECHO>>HFSLIP.log Files in your HF folder:
 IF EXIST HF\BASIC\*.exe (
-	FOR /F %%I IN ('DIR /B/ON HF\BASIC\*.exe') DO (ECHO>>HFSLIP.log BASIC\%%I)
+	FOR /F %%I IN ('DIR /B HF\BASIC\*.exe') DO (ECHO>>HFSLIP.log BASIC\%%I)
 )
 IF EXIST HF\NOREG\*.exe (
-	FOR /F %%I IN ('DIR /B/ON HF\NOREG\*.exe') DO (ECHO>>HFSLIP.log NOREG\%%I)
+	FOR /F %%I IN ('DIR /B HF\NOREG\*.exe') DO (ECHO>>HFSLIP.log NOREG\%%I)
 )
-FOR /F %%I IN ('DIR /A-D HF') DO (SET /A "HFFILES=1")
+FOR /F %%I IN ('DIR /A:-D HF') DO (SET /A "HFFILES=1")
 IF DEFINED HFFILES (
-	DIR /B/A-D/ON HF>>HFSLIP.log
+	DIR /B/A:-D HF>>HFSLIP.log
 	SET "HFFILES="
 )
 ECHO/>>HFSLIP.log
 ECHO>>HFSLIP.log Files in your HFCABS folder:
-DIR /B/ON HFCABS>>HFSLIP.log
+DIR /B HFCABS>>HFSLIP.log
 ECHO/>>HFSLIP.log
 ECHO>>HFSLIP.log Files in your HFGUIRUNONCE folder:
-DIR /B/ON HFGUIRUNONCE>>HFSLIP.log
+DIR /B HFGUIRUNONCE>>HFSLIP.log
 ECHO/>>HFSLIP.log
 ECHO>>HFSLIP.log Files in your HFSVCPACK folder:
-DIR /B/ON HFSVCPACK>>HFSLIP.log
+DIR /B HFSVCPACK>>HFSLIP.log
 ECHO/>>HFSLIP.log
 ECHO>>HFSLIP.log Files in your HFSVCPACK_SW1 folder:
-DIR /B/ON HFSVCPACK_SW1>>HFSLIP.log
+DIR /B HFSVCPACK_SW1>>HFSLIP.log
 ECHO/>>HFSLIP.log
 ECHO>>HFSLIP.log Files in your HFSVCPACK_SW2 folder:
-DIR /B/ON HFSVCPACK_SW2>>HFSLIP.log
+DIR /B HFSVCPACK_SW2>>HFSLIP.log
 ECHO/>>HFSLIP.log
 ECHO>>HFSLIP.log Files in your HFTOOLS folder:
-DIR /B/ON HFTOOLS>>HFSLIP.log
+DIR /B HFTOOLS>>HFSLIP.log
 ECHO/>>HFSLIP.log
 IF EXIST HFAAO (
 	ECHO>>HFSLIP.log Files in your HFAAO folder:
@@ -5505,7 +5541,7 @@ IF EXIST HFAAO (
 )
 IF EXIST HFEXPERT (
 	ECHO>>HFSLIP.log Files in your HFEXPERT folder:
-	DIR /B/ON/A-D-H-S/S HFEXPERT | FINDSTR /C:"\\\." /V>>HFSLIP.log
+	DIR /B/A:-D-H-S/S HFEXPERT | FINDSTR /C:"\\\." /V>>HFSLIP.log
 	ECHO/>>HFSLIP.log
 )
 IF EXIST HFCLEANUP (
@@ -5516,7 +5552,7 @@ IF EXIST HFCLEANUP (
 ECHO>>HFSLIP.log Files in your REPLACE folder:
 CALL :ISNOTEMPTY REPLACE
 IF DEFINED NOTEMPTY (
-	DIR /B/ON/A-D-H-S/S REPLACE | FINDSTR /C:"\\\." /V>>HFSLIP.log
+	DIR /B/A:-D-H-S/S REPLACE | FINDSTR /C:"\\\." /V>>HFSLIP.log
 	SET "NOTEMPTY="
 )
 ECHO/>>HFSLIP.log
@@ -5773,7 +5809,7 @@ SET "DefExcHF=%IGNORESP% %IGNORETZ% Center2005 %MCEMP10CUM% 898461 891122 926139
 IF "VERSIONIE"=="IE8" (SET "DefExcHF=%DefExcHF% \-win IE8")
 SET "IGNORESP="
 SET "IGNORETZ="
-DIR /B/A-D/OGN/ON HF\*.exe>HF.txt
+DIR /B/A:-D/O:NG HF\*.exe>HF.txt
 FINDSTR /LI /C:WINDOWS HF.txt>HFT1.txt
 FINDSTR /VIR "%DefExcHF% 817787 833989 917344\-56 Script56" HFT1.txt>HF1.txt
 FINDSTR /IR "888111 MDAC253 MDAC281 Q......_WXP_SP._ W2K_SP5 scrip...\.exe" HF.txt>>HF1.txt
@@ -5862,7 +5898,7 @@ IF EXIST TEMP\UPDATE\update.inf (
 )
 
 DEL /Q/F TSINF.txt
-FOR /F %%I IN ('DIR /B/ON TEMP\UPDATE\*.inf') DO (SET "HFXINF=%%I")
+FOR /F %%I IN ('DIR /B TEMP\UPDATE\*.inf') DO (SET "HFXINF=%%I")
 REM "and if there are several HFXINFs???"
 IF NOT DEFINED HFXINF (GOTO :EOF)
 SET /A "HFSLP+=1"
@@ -6048,7 +6084,7 @@ IF "%VERSION%"=="2000" (
 	IF EXIST TEMP\UPDATE\*2k3.cat (DEL /Q/F TEMP\UPDATE\*2k3.cat)
 	CALL :BANDAIDXP2K3
 	IF EXIST TEMP\UPDATE\*928470* IF "%SUBTAG%"=="ic" (
-		FOR /F %%I IN ('DIR /B/A-D/S TEMP\windowsupdatepkg') DO (MOVE /Y "%%I" TEMP >NUL)
+		FOR /F %%I IN ('DIR /B/A:-D/S TEMP\windowsupdatepkg') DO (MOVE /Y "%%I" TEMP >NUL)
 		FOR /F "tokens=2 delims=," %%I IN ('FINDSTR /IR "\.Files=11," TEMP\UPDATE\updHFSLP.inf') DO (SET "TXTDIR06=%%~I")
 	)
 ) ELSE (
@@ -6084,7 +6120,7 @@ IF EXIST TEMP\WM8\mpg4ds32.ax (MOVE /Y TEMP\WM8\mpg4ds32.ax TEMP >NUL)
 REM "makeweight. here TEMP\SP3GDR\ TEMP\SP3QFE\ TEMP\SP2QFE\ is cleaned in the new xp-sp3 or 2003 hotfix format (in which delta compression)"
 REM "Why - it’s unclear, because as a result, all files from WindowsXP-KB2423089-x86-RUS.exe, etc. XP hotfixes will be removed. or not?"
 
-DIR /B/AD TEMP>TSDIR.txt
+DIR /B/A:D TEMP>TSDIR.txt
 FOR /F %%I IN ('FINDSTR /I "GDR QFE" TSDIR.txt') DO (
 	IF EXIST TEMP\%%I (RD /Q/S TEMP\%%I)
 )
@@ -6244,7 +6280,7 @@ IF "%VERSION%"=="2000" (
 			IF EXIST TEMP\wmpcore8.dll (REN TEMP\wmpcore8.dll wmpcore.dll)
 		)
 		IF EXIST TEMP\ivfsrc.ax (
-			FOR /F %%I IN ('DIR /B/A-D TEMP') DO (ECHO>>WORK\NSFREGNOT.txt %%I)
+			FOR /F %%I IN ('DIR /B/A:-D TEMP') DO (ECHO>>WORK\NSFREGNOT.txt %%I)
 		)
 	)
 )
@@ -6432,11 +6468,11 @@ IF NOT DEFINED HFCBASE IF NOT "%DIAGNOSTIC%"=="1" (GOTO :EOF)
 ECHO/
 ECHO Processing HFCLEANUP
 
-IF EXIST HFCLEANUP\*.RDV (
+IF EXIST HFCLEANUP\*.rdv (
 	REM Delete the driver files.
-	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.RDV') DO (
+	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.rdv') DO (
 		ECHO DELETING DRIVERS - %%I
-		FOR /F %%J IN (HFCLEANUP\%%I.RDV) DO (
+		FOR /F %%J IN (HFCLEANUP\%%I.rdv) DO (
 			IF NOT EXIST %SOURCESS%\DRIVER\%%I (MD %SOURCESS%\DRIVER\%%I)
 			IF NOT EXIST %SOURCESS%\DRIVERCAB\%%I (MD %SOURCESS%\DRIVERCAB\%%I)
 			IF EXIST %SOURCESS%\I386\%%J* (MOVE %SOURCESS%\I386\%%J* %SOURCESS%\DRIVER\%%I >NUL)
@@ -6446,12 +6482,12 @@ IF EXIST HFCLEANUP\*.RDV (
   )
 )
 
-IF EXIST HFCLEANUP\*.REM (
+IF EXIST HFCLEANUP\*.rem (
 	REM Delete the junk binaries.
-	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.REM') DO (
+	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.rem') DO (
 		ECHO DELETING FILES - %%I
 		IF NOT EXIST %SOURCESS%\OPTIONAL\%%I (MD %SOURCESS%\OPTIONAL\%%I)
-		FOR /F %%J IN (HFCLEANUP\%%I.REM) DO (
+		FOR /F %%J IN (HFCLEANUP\%%I.rem) DO (
 			IF EXIST %SOURCESS%\I386\%%J* (MOVE %SOURCESS%\I386\%%J* %SOURCESS%\OPTIONAL\%%I >NUL)
 			ECHO %%J>>WORK\RED\FILTER.txt
 		)
@@ -6505,12 +6541,12 @@ IF EXIST WORK\RED\FILTER.txt (
 	MOVE TXTSETUP.sif %SOURCESS%\I386\TXTSETUP.sif
 )
 
-IF EXIST HFCLEANUP\*.RIN (
+IF EXIST HFCLEANUP\*.rin (
 	ECHO/
 	ECHO Expand INFs to be gutted
 	ECHO/
-	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.RIN') DO (
-		FOR /F "delims=;" %%J IN (HFCLEANUP\%%I.RIN) DO (
+	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.rin') DO (
+		FOR /F "delims=;" %%J IN (HFCLEANUP\%%I.rin) DO (
 			IF NOT EXIST WORK\RED\%%JF IF EXIST %SOURCESS%\I386\%%J_ (
 				EXPAND -R %SOURCESS%\I386\%%J_ WORK\RED
 				ECHO %%JF
@@ -6522,7 +6558,14 @@ IF EXIST HFCLEANUP\*.RIN (
 		)
 	)
 	
-	IF EXIST WORK\RED\INTL.inf (DEL /Q /F WORK\RED\INTL.inf && TYPE %SOURCESS%\I386\INTL.inf>>WORK\RED\INTL.inf)
+	IF EXIST WORK\RED\INTL.inf (
+		DEL /Q /F WORK\RED\INTL.inf
+		IF !ERRORLEVEL! EQU 0 (
+			TYPE %SOURCESS%\I386\INTL.inf>>WORK\RED\INTL.inf
+		) ELSE (
+			(CALL )
+		)
+	)
 	IF EXIST %SOURCESS%\I386\WMS (RD /Q /s %SOURCESS%\I386\WMS)
 	IF EXIST %SOURCESS%\AUTORUN.inf (DEL /Q /F %SOURCESS%\AUTORUN.inf)
 	IF EXIST %SOURCESS%\READ1ST.txt (DEL /Q /F %SOURCESS%\READ1ST.txt)
@@ -6532,23 +6575,23 @@ IF EXIST HFCLEANUP\*.RIN (
 	ECHO/
 	ECHO Gut the INF files
 	ECHO/
-	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.RIN') DO (
-		FOR /F "tokens=1,2 delims=;" %%J IN (HFCLEANUP\%%I.RIN) DO (
+	FOR /F "delims=." %%I IN ('DIR /B HFCLEANUP\*.rin') DO (
+		FOR /F "tokens=1,2 delims=;" %%J IN (HFCLEANUP\%%I.rin) DO (
 			ECHO Processing %%J, filtering string %%I
 			IF EXIST WORK\RED\%%JF (
 				FINDSTR /V /I /C:"%%K" WORK\RED\%%JF > WORK\RED\T.inf
 				DEL WORK /Q /F WORK\RED\%%JF
 				REN WORK\RED\T.inf %%JF
 			)
-			IF EXIST WORK\RED\%%JF IF EXIST HFCLEANUP\%%I.REM (
-				FINDSTR /V /I /G:HFCLEANUP\%%I.REM WORK\RED\%%JF > WORK\RED\T.inf
+			IF EXIST WORK\RED\%%JF IF EXIST HFCLEANUP\%%I.rem (
+				FINDSTR /V /I /G:HFCLEANUP\%%I.rem WORK\RED\%%JF > WORK\RED\T.inf
 				DEL WORK /Q /F WORK\RED\%%JF
 				REN WORK\RED\T.inf %%JF
 			)
-			IF EXIST WORK\RED\%%JF IF EXIST HFCLEANUP\%%I.RDV (
-				FINDSTR /V /I /G:HFCLEANUP\%%I.RDV WORK\RED\%%JF > WORK\RED\T.inf
+			IF EXIST WORK\RED\%%JF IF EXIST HFCLEANUP\%%I.rdv (
+				FINDSTR /V /I /G:HFCLEANUP\%%I.rdv WORK\RED\%%JF > WORK\RED\T.inf
 				DEL WORK /Q /F WORK\RED\%%JF
-				REN WORK\RED\T.inf %%JF      
+				REN WORK\RED\T.inf %%JF
 			)
 		)
 	)
@@ -6575,7 +6618,7 @@ IF EXIST HFCLEANUP\*.RIN (
 
 REM Runs the INF file DEFAULTINSTALL section.
 IF EXIST HFCLEANUP\*.inf (
-	DIR HFCLEANUP\*.inf /A-D /OGN /B >WORK\HFEXPERTINF.txt
+	DIR /B/A:-D/O:NG HFCLEANUP\*.inf >WORK\HFEXPERTINF.txt
 	COPY /Y HFCLEANUP\*.inf %SOURCESS%\I386 >NUL
 	SET /A "HFSLP=10"
 	REM @;
@@ -6675,7 +6718,7 @@ IF EXIST WORK\I386E\MSDMO.dll IF EXIST TEMP\CODECS\MSDMO.dll (
 	PAUSE>CON
 	DEL /Q/F TEMP\CODECS\MSDMO.dll
 )
-DIR /B/A-D TEMP\CODECS>TEMP\HFEXPERT.txt
+DIR /B/A:-D TEMP\CODECS>TEMP\HFEXPERT.txt
 FINDSTR /R ".........\." TEMP\HFEXPERT.txt>TEMP\CLONG.txt
 FOR /F %%I IN (TEMP\CLONG.txt) DO (SET /A "CODNBR=99")
 IF NOT DEFINED CODNBR (
@@ -6692,7 +6735,7 @@ IF NOT DEFINED CODNBR (
 )
 SET "CODNBR="
 IF EXIST TEMP\CODECS\*.inf (
-	DIR /B/A-D TEMP\CODECS\*.inf>TEMP\HFEXPERTINF.txt
+	DIR /B/A:-D TEMP\CODECS\*.inf>TEMP\HFEXPERTINF.txt
 	MOVE /Y TEMP\CODECS\*.inf %SOURCESS%\I386
 )
 FINDSTR /VIR "\.exe \.CPI \.CPL \.inf \.txt" TEMP\HFEXPERT.txt>TEMP\HFEXPERTREG.txt
@@ -6739,7 +6782,7 @@ ECHO Processing HFEXPERT Application Replacement
 ECHO/
 
 REM Copies files to the sources and replaces the originals like TASKMGR.exe and MPLAYER2.exe
-DIR /B/A-D HFEXPERT\APPREPLACEMENT>WORK\HFEXPERT.txt
+DIR /B/A:-D HFEXPERT\APPREPLACEMENT>WORK\HFEXPERT.txt
 XCOPY /HY HFEXPERT\APPREPLACEMENT\* WORK\I386E
 FOR /F %%I IN (WORK\HFEXPERT.txt) DO (%MODIFYPE% WORK\I386E\%%I -c)
 DEL /Q/F WORK\HFEXPERT.txt
@@ -6753,7 +6796,7 @@ ECHO/
 ECHO Processing HFEXPERT Hives
 ECHO/
 
-DIR /B/A-D HFEXPERT\HIVEINSTALL>WORK\HFEXPERT.txt
+DIR /B/A:-D HFEXPERT\HIVEINSTALL>WORK\HFEXPERT.txt
 XCOPY /HY HFEXPERT\HIVEINSTALL\* %SOURCESS%\I386
 FOR /F %%I IN (WORK\HFEXPERT.txt) DO (
 	ECHO>>%SOURCESS%\I386\TXTSETUP.sif %%I = 1,,,,,,_x,3,,3
@@ -6774,7 +6817,7 @@ ECHO/
 FOR /F %%I IN ('DIR /B HFEXPERT\AUTOIT\AUTOIT*.exe') DO (SET "AUTOEXE=%%I")
 IF NOT DEFINED AUTOEXE (GOTO :EOF)
 COPY /Y HFEXPERT\AUTOIT\*.* %SOURCESS%\I386\SVCPACK
-FOR /F %%I IN ('DIR /B/ON HFEXPERT\AUTOIT\*.AU*') DO (ECHO>>WORK\HFSLIPCMDP1.cmd %%HFSLIPSVC%%%AUTOEXE% %%HFSLIPSVC%%%%I)
+FOR /F %%I IN ('DIR /B HFEXPERT\AUTOIT\*.AU*') DO (ECHO>>WORK\HFSLIPCMDP1.cmd %%HFSLIPSVC%%%AUTOEXE% %%HFSLIPSVC%%%%I)
 SET "AUTOEXE="
 GOTO :EOF
 REM ---------- ----------
@@ -6855,7 +6898,7 @@ ECHO/
 ECHO Processing HFEXPERT Windows Files - System32 Files
 ECHO/
 
-DIR /B/A-D TEMP\WIN\SYSTEM32>TEMP\HFEXPERT.txt
+DIR /B/A:-D TEMP\WIN\SYSTEM32>TEMP\HFEXPERT.txt
 FOR /F %%I IN (TEMP\HFEXPERT.txt) DO (SET /A "HFESYS32FILES=1")
 IF NOT DEFINED HFESYS32FILES (GOTO :EOF)
 SET "HFESYS32FILES="
@@ -6895,17 +6938,22 @@ REM "so that the command does not try to substitute short names instead of long 
 REM "and so that the PathName=!DirName:%basedir%=! construction will continue to work correctly."
 REM "Although this doesn't happen in another similar section of code, it's possible that DIRCMD is being set implicitly somewhere!"
 
-FOR /F "delims=" %%I IN ('DIR /B /S /ON /AD "%BASEDIR%"') DO (
+FOR /F "delims=" %%I IN ('DIR /B/A:D/S "%BASEDIR%"') DO (
 	REM TODO Is this a check if BASEDIR even exists, or if the prior loop failed?
-	IF ERRORLEVEL 0 (
-		DIR /B /A-D "%%I" >NUL 2>&1 && (
+	IF !ERRORLEVEL! EQU 0 (
+		DIR /B/A:-D "%%I" >NUL 2>&1
+		IF !ERRORLEVEL! EQU 0 (
 			REM CALL :PATHS "%%~I"
 			REM "we leave only the relative path [“cut off” the left part - basedir]"
 			SET "DIRNAME=%%~I"
 			SET "PATHNAME=!DIRNAME:%BASEDIR%=!"
 			ECHO !PATHNAME!>>TEMP\XPERTDIR.txt
 			XCOPY /HY TEMP\WIN\!PATHNAME!\* WORK\I386Z
+		) ELSE (
+			(CALL )
 		)
+	) ELSE (
+		(CALL )
 	)
 )
 SET "DIRNAME="
@@ -6916,7 +6964,7 @@ FOR /F "delims=" %%I IN (TEMP\XPERTDIR.txt) DO (
 	ECHO>>TEMP\TXTNTDIR.txt !SIFDIR! = "%%I"
 	
 	REM "and add entries about the files [HFEXPERT.txt - temporary for each subdirectory]"
-	DIR /B /ON /A-D TEMP\WIN\%%I > TEMP\HFEXPERT.txt
+	DIR /B/A:-D TEMP\WIN\%%I > TEMP\HFEXPERT.txt
 	FOR /F "delims=" %%J IN (TEMP\HFEXPERT.txt) DO (
 		ECHO>>TEMP\HFWINTXT.txt %%J = 1,,,,,,,!SIFDIR!,0,0
 		ECHO>>TEMP\HFWINDOS.txt d1,%%J
@@ -6936,7 +6984,7 @@ ECHO Processing HFEXPERT Program Files
 ECHO/
 
 REM Based on HFEXPERT code by Yzöwl!
-FOR /F %%I IN ('DIR /B/S/A-D HFEXPERT\PROGRAMFILES') DO (SET /A "TEMPPRG=1")
+FOR /F %%I IN ('DIR /B/A:-D/S HFEXPERT\PROGRAMFILES') DO (SET /A "TEMPPRG=1")
 IF NOT DEFINED TEMPPRG (GOTO :EOF)
 SET "TEMPPRG="
 
@@ -6948,14 +6996,14 @@ IF NOT DEFINED CDTAG (
 )
 
 MD TEMP
-FOR /F %%I IN ('DIR /B /A-D HFEXPERT\PROGRAMFILES') DO (
+FOR /F %%I IN ('DIR /B/A:-D HFEXPERT\PROGRAMFILES') DO (
 	SET /A "PFROOT=1"
 )
 IF DEFINED PFROOT (
 	ECHO>>TEMP\HFEPRGDDIR.txt CopyFiles1=16422
 	ECHO/>>TEMP\HFEPRGCFIL.txt
 	ECHO>>TEMP\HFEPRGCFIL.txt [CopyFiles1]
-	FOR /F "delims=" %%K in ('DIR /B/A-D HFEXPERT\PROGRAMFILES') DO (
+	FOR /F "delims=" %%K in ('DIR /B/A:-D HFEXPERT\PROGRAMFILES') DO (
 		ECHO Processing %%K ***** -7-
 		ECHO>>TEMP\HFEPRGSDF.txt "%%K"=1
 		ECHO>>TEMP\HFEPRGCFIL.txt "%%K"
@@ -6968,14 +7016,19 @@ IF DEFINED PFROOT (
 )
 
 SET "BASEDIR=%~dp0HFEXPERT\PROGRAMFILES\"
-FOR /F "delims=" %%I IN ('DIR /B/S/ON/AD HFEXPERT\PROGRAMFILES') DO (
+FOR /F "delims=" %%I IN ('DIR /B/A:D/S HFEXPERT\PROGRAMFILES') DO (
 	REM TODO Is this a check if HFEXPERT\PROGRAMFILES even exists, or if the prior loop failed?
-	IF ERRORLEVEL 0 (
-		DIR /B/A-D "%%I" >NUL 2>&1 && (
+	IF !ERRORLEVEL! EQU 0 (
+		DIR /B/A:-D "%%I" >NUL 2>&1
+		IF !ERRORLEVEL! EQU 0 (
 			SET "DIRNAME=%%~I"
 			SET "ENDPATH=!DIRNAME:%BASEDIR%=!"
 			ECHO !ENDPATH!>>TEMP\PRGDIR.txt
+		) ELSE (
+			(CALL )
 		)
+	) ELSE (
+		(CALL )
 	)
 )
 SET "DIRNAME="
@@ -7003,7 +7056,7 @@ IF EXIST TEMP\PRGDIR.txt (
 		ECHO>>TEMP\HFEPRGDDIR.txt CopyFiles!CFCOUNT!=16422,"!PRGSUBVAR!"
 		ECHO/>>TEMP\HFEPRGCFIL.txt
 		ECHO>>TEMP\HFEPRGCFIL.txt [CopyFiles!CFCOUNT!]
-		FOR /F "delims=" %%K IN ('DIR /B/ON/A-D "HFEXPERT\PROGRAMFILES\!PRGSUBVAR!"') DO (
+		FOR /F "delims=" %%K IN ('DIR /B/A:-D "HFEXPERT\PROGRAMFILES\!PRGSUBVAR!"') DO (
 			ECHO Processing %%K ***** -6-
 			ECHO>>TEMP\HFEPRGSDF.txt "!PRGSUBVAR!\%%K"=1
 			ECHO>>TEMP\HFEPRGCFIL.txt "%%K","!PRGSUBVAR!\%%K"
@@ -7075,7 +7128,7 @@ IF DEFINED SPXPASS (
 )
 ECHO/
 ECHO Adding files from %DRVSRC%
-FOR /F "delims=" %%I IN ('DIR /B/A-D-H-S/S "%DRVSRC%" ^| FINDSTR /C:"\\\." /V') DO (
+FOR /F "delims=" %%I IN ('DIR /B/A:-D-H-S/S "%DRVSRC%" ^| FINDSTR /C:"\\\." /V') DO (
 	IF /I NOT "%%~xI"==".inf" (
 		ECHO %%~nI%%~xI
 		XCOPY /HY "%%I" %DRVDEST% >NUL
@@ -7104,7 +7157,7 @@ ECHO/
 
 FOR /F "delims=" %%I IN ('DIR /B HFAAO') DO (SET /A "AAOTBP=1")
 IF NOT DEFINED AAOTBP GOTO :EOF
-FOR /F "delims=" %%I IN ('DIR /B/A-D/ON HFAAO') DO (
+FOR /F "delims=" %%I IN ('DIR /B/A:-D HFAAO') DO (
 	ECHO/
 	ECHO Processing %%I
 	HFTOOLS\7za.exe x "HFAAO\%%I" -o"%PREP%\TEMP\AAO" -r >NUL
@@ -7118,7 +7171,7 @@ REM ---------- ----------
 REM ---------- Application Addons - Processing ----------
 :PROCESS_AAO
 IF EXIST TEMP\AAO\RVMUp*.in* (SET /A "RVMUP=1")
-DIR /B/A-D/S TEMP\AAO>TEMP\CHKCMP.txt
+DIR /B/A:-D/S TEMP\AAO>TEMP\CHKCMP.txt
 FOR /F "delims=" %%I IN ('FINDSTR /IER "_" TEMP\CHKCMP.txt') DO (
 	EXPAND -R "%%I" >NUL
 	DEL /Q/F "%%I"
@@ -7651,7 +7704,7 @@ IF NOT "%VERSION%"=="2000" (
 	ECHO>>WORK\FULLSRC.txt WSDUENG.dll
 	ECHO>>WORK\FULLSRC.txt tscupdc.dll
 )
-DIR /B/A-D WORK\I386E>WORK\NSFALL.txt
+DIR /B/A:-D WORK\I386E>WORK\NSFALL.txt
 FINDSTR /VIB /G:WORK\FULLSRC.txt WORK\NSFALL.txt>WORK\NSFALLt.txt
 FINDSTR /VIR "bitsinst\.exe ris\.vbs \.xml" WORK\NSFALLt.txt>WORK\NSFALL1.txt
 FOR /F %%I IN (WORK\NSFALL1.txt) DO (ECHO>>%SOURCESS%\I386\DOSNET.inf d1,%%I)
@@ -7732,7 +7785,7 @@ IF EXIST WORK\I386E\WMS (
 		CALL :UNICAB1
 		ECHO>>UC.ddf .Set CabinetNameTemplate=WMS4.cab
 		ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-		FOR /F %%I IN ('DIR /B/ON WORK\WMS') DO ECHO>>UC.ddf WORK\WMS\%%I
+		FOR /F %%I IN ('DIR /B WORK\WMS') DO (ECHO>>UC.ddf WORK\WMS\%%I)
 		CALL :UNICAB2
 	)
 	RD /Q/S WORK\I386E\WMS
@@ -7814,7 +7867,7 @@ IF EXIST WORK\I386E\nntp* (
 		CALL :UNICAB1
 		ECHO>>UC.ddf .Set CabinetNameTemplate=INS.cab
 		ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-		FOR /F %%I IN ('DIR /B/ON WORK\SVRINS') DO (ECHO>>UC.ddf WORK\SVRINS\%%I)
+		FOR /F %%I IN ('DIR /B WORK\SVRINS') DO (ECHO>>UC.ddf WORK\SVRINS\%%I)
 		CALL :UNICAB2
 		DEL /Q/F WORK\I386E\nntp_*
 	)
@@ -7933,7 +7986,7 @@ IF EXIST WORK\I386E\msmsgs.exe (
 	CALL :UNICAB1
 	ECHO>>UC.ddf .Set CabinetNameTemplate=MMSSETUP.cab
 	ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-	FOR /F %%I IN ('DIR /B/ON WORK\MMSSETUP') DO (ECHO>>UC.ddf WORK\MMSSETUP\%%I)
+	FOR /F %%I IN ('DIR /B WORK\MMSSETUP') DO (ECHO>>UC.ddf WORK\MMSSETUP\%%I)
 	CALL :UNICAB2
 	DEL /Q/F WORK\I386E\msmsgs.exe
 )
@@ -8064,7 +8117,7 @@ IF DEFINED XPNETFX IF EXIST HF\NDP1.0sp3*.exe (
 		CALL :UNICAB1
 		ECHO>>UC.ddf .Set CabinetNameTemplate=NETFX.cab
 		ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\CMPNENTS\NETFX\I386
-		FOR /F %%I IN ('DIR /B/ON WORK\MCE\NETFX10') DO (ECHO>>UC.ddf WORK\MCE\NETFX10\%%I)
+		FOR /F %%I IN ('DIR /B WORK\MCE\NETFX10') DO (ECHO>>UC.ddf WORK\MCE\NETFX10\%%I)
 		CALL :UNICAB2
 		SET "NETFX10="
 	)
@@ -8090,7 +8143,7 @@ IF EXIST SOURCE\I386\NETFX.cab (
 		CALL :UNICAB1
 		ECHO>>UC.ddf .Set CabinetNameTemplate=NETFX.cab
 		ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-		FOR /F %%I IN ('DIR /B/ON WORK\NETFX11') DO (ECHO>>UC.ddf WORK\NETFX11\%%I)
+		FOR /F %%I IN ('DIR /B WORK\NETFX11') DO (ECHO>>UC.ddf WORK\NETFX11\%%I)
 		CALL :UNICAB2
 		SET "NETFX11="
 	)
@@ -8111,7 +8164,7 @@ IF EXIST SOURCE\I386\WMS.cab (
 		CALL :UNICAB1
 		ECHO>>UC.ddf .Set CabinetNameTemplate=WMS.cab
 		ECHO>>UC.ddf .Set DiskDirectory1=%SOURCESS%\I386
-		FOR /F %%I IN ('DIR /B/ON WORK\WMS') DO (ECHO>>UC.ddf WORK\WMS\%%I)
+		FOR /F %%I IN ('DIR /B WORK\WMS') DO (ECHO>>UC.ddf WORK\WMS\%%I)
 		CALL :UNICAB2
 		SET "WMSNEW="
 	)
@@ -8248,10 +8301,8 @@ IF "%VERSION%"=="2000" (
 	IF NOT EXIST WORK\I386E\sfc_os.dll (EXPAND SOURCE\I386\SFC_OS.dl_ -R WORK\I386E)
 	HFTOOLS\PatchPAE3.exe -type bypass_wfp -o WORK\I386E\sfc_osnew.dll WORK\I386E\sfc_os.dll
 ) ELSE (CALL)
-REM The above CALL *should* SET ERRORLEVEL to 1.
 
-REM TODO Make sure straight-reading ERRORLEVEL instead of first assigning its value to a "local" variable works as intended.
-IF ERRORLEVEL 0 (
+IF %ERRORLEVEL% EQU 0 (
 	IF "%VERSION%"=="2000" (
 		DEL /F /Q WORK\I386E\sfc.dll
 		REN WORK\I386E\sfcnew.dll sfc.dll
@@ -8262,6 +8313,7 @@ IF ERRORLEVEL 0 (
 	REM "don't eat the cat! Meow!"
 	SET /A "DELCATS=1"
 ) ELSE (
+	(CALL )
 	ECHO SFC/WFP patch failed.
 	DEL /F /Q WORK\I386E\sfcnew.dll >NUL 2>&1
 	DEL /F /Q WORK\I386E\sfc_osnew.dll >NUL 2>&1
@@ -8292,14 +8344,15 @@ IF NOT EXIST WORK\I386E\setupapi.dll (EXPAND SOURCE\I386\SETUPAPI.dl_ -R WORK\I3
 
 IF "%VERSION%"=="2000" (
 	HFTOOLS\PatchPAE3.exe -type setupapi_digicert -o WORK\I386E\setupapi_new.dll WORK\I386E\setupapi.dll
-) ELSE (CALL)
-REM The above CALL *should* SET ERRORLEVEL to 1.
+) ELSE (
+	(CALL)
+)
 
-REM TODO Make sure straight-reading ERRORLEVEL instead of first assigning its value to a "local" variable works as intended.
-IF ERRORLEVEL 0 (
+IF %ERRORLEVEL% EQU 0 (
 	DEL /F /Q WORK\I386E\setupapi.dll
 	REN WORK\I386E\setupapi_new.dll setupapi.dll
 ) ELSE (
+	(CALL )
 	ECHO Driver Signing patch failed.
 	DEL /F /Q WORK\I386E\setupapi_new.dll >NUL 2>&1
 )
@@ -8332,22 +8385,31 @@ IF "%VERSION%"=="2000" (
 	HFTOOLS\PatchPAE3.exe -type kernel -o WORK\I386E\ntkrnlpa-new.exe WORK\I386E\ntkrnlpa.exe
 ) ELSE (CALL)
 SET /A "el1=%ERRORLEVEL%"
+(CALL )
 IF "%VERSION%"=="2000" (
 	HFTOOLS\PatchPAE3.exe -type kernel -o WORK\I386E\ntkrpamp-new.exe WORK\I386E\ntkrpamp.exe
-) ELSE (CALL)
-REM The above CALLs SET ERRORLEVEL to 1.
+) ELSE (
+	(CALL)
+)
+REM The above CALL (without space) SETs ERRORLEVEL to 1. The bellow CALL (with space) SETs ERRORLEVEL to 0.
 SET /A "el2=%ERRORLEVEL%"
+(CALL )
+SET /A "el3=%el1% | %el2%"
+SET "el1="
+SET "el2="
 
-IF %el1% EQU 0 IF %el2% EQU 0 (
+IF %el3% EQU 0 (
 	DEL /F /Q WORK\I386E\ntkrnlpa.exe
 	REN WORK\I386E\ntkrnlpa-new.exe ntkrnlpa.exe
 	DEL /F /Q WORK\I386E\ntkrpamp.exe
 	REN WORK\I386E\ntkrpamp-new.exe ntkrpamp.exe
 ) ELSE (
+	(CALL )
 	ECHO PAE patch failed.
 	DEL /F /Q WORK\I386E\ntkrnlpa-new.exe >NUL 2>&1
 	DEL /F /Q WORK\I386E\ntkrpamp-new.exe >NUL 2>&1
 )
+SET "el3="
 GOTO :EOF
 REM ---------- ----------
 
