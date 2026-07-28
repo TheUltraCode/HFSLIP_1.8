@@ -475,4 +475,14 @@ a bit and make it easier for newer devs to have a look at the code.
                  Cleaned-up some documentation text inside of the script, changed the searched-for location of HFANSWER.ini to the base directory,
                  made sure everything in the HFTOOLS directory was up-to-date, and uploaded the main parts of the program and the contents of
                  HFTOOLS separetely to GitHub.
-
+* 2026 Jul. 26 - Fixed a licensing issue - relicensed to CC 4.0 BY-NC-SA, building-on-top-of HFSLIP 1.7.10 Beta J's CC 3.0 BY-NC-SA. GPL v3 was not
+                 an appropriate license.
+                 Standardized ERRORLEVEL reading, properly read ERRORLEVEL inside codeblocks with DelayedExpansion, and properly reset ERRORLEVEL.
+                 Replaced all EXITs with EXIT /B's.
+                 Removed all instances of the "/ON" flag for DIR, as well as made "/A" and any remaining "/O" flags use colons for sub-flags.
+                 Removed most conditional execution statements (&& and ||)
+                 Fixed problematic, chained-together IF statements.
+                 Other formatting fixes here and there.
+                 Added/updated/deleted various comments.
+                 Renamed and updated two of the DOC\ files ("function breakdown.txt">"subroutine tree.txt", and "function layout.txt">"subroutine
+                 breakdown.txt")
